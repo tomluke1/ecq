@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,78 +7,77 @@
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
 
-<!-- Geocoder Plugin CSS -->
-<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.2.0/mapbox-gl-geocoder.css" />
-
-<!-- Geocoder Plugin JS -->
+<!-- Geocoder Plugin CSS JS -->
+<link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.2.0/mapbox-gl-geocoder.css" rel="stylesheet" />
 <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.2.0/mapbox-gl-geocoder.min.js"></script>
 
 </head>
 <body>
 
 <style>
-    body { margin: 0; padding: 0; }
-    h3 { margin: 10px; font-size: 16px; }
-    
-    /**
-    * Create a position for the map
-    * on the page */
-    #map {
-      width: 75%;
-      height: 100%;
-     /* border-radius: 8px; */
-     /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); */
-      border-color: #020f17;
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Be Vietnam Pro', sans-serif !important;
+      color: #142223 !important;
     }
+
+    h3 { margin-top: 10px; margin-left: 0px; margin-bottom: 5px; margin-right: 10px; font-size: 16px; }
+    p {margin-left: 20px; margin-right: 20px;}
     
-    #map-wrapper {
+    #page-container {
+      padding: 0 20px;
+      box-sizing: border-box;
+      width: 100%;
+      overflow-x: hidden;
+      min-width: 400px;
+    }
+
+    #contents-wrapper {
       position: relative;
-      width: 75vw;
+      width: 100%;
+      max-width: 1440px;
+      min-width: 360px;
       height: 90vh;
-      margin: 5vh auto 0; /* center horizontally and add top margin */
+      margin: 5vh auto 0;
+      box-sizing: border-box;
       border: 1px solid #ccc;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
       border-radius: 6px;
       overflow: hidden;
-      display: flex;
     }
 
-    /**
-    * Set rules for how the map overlays
-    * (information box and legend) will be displayed
-    * on the page. */
-    #overlay-container {
-      width: 25%;
-      height: 100%;
+    #top-container {
+      position: relative;
+      width: 100%;
+      min-height: 35%;
+      max-height: none;
+      height: auto;
       background: white;
-      padding: 16px;
+      z-index: 10;
       display: flex;
       flex-direction: column;
-      font-family: sans-serif;
-      overflow-y: auto;
-      z-index: 10;
-      position: relative; /* Required for z-index to take effect */
-      border-right: 1px solid #ccc;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 0px;
+      box-sizing: border-box;
     }
 
-    #overlay-container > div:last-child {
+    #top-container > div:last-child {
     border-bottom: none; /* Remove line under last section */
     }
 
-    #legend { /** defines the bottom right box showing the permanent legend*/
-      font-size: 14px;
-      box-shadow: 0 1px 2px rgba(0 0 0 0.1);
-      line-height: 18px;
-      height: max-content; /* Allows height to expand based on content */
-      width: max-content; /* Allows height to expand based on content */;
+    .page-title {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 4px;
+      text-align: center;
     }
-    
-    #legend .legend-key {
-    display: inline-block;
-    width: 15px;
-    height: 15px;
-    margin-right: 5px;
-    vertical-align: middle;
+
+    .page-subtitle {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 16px;
+      text-align: center;
     }
     
     #geocoder {
@@ -92,40 +92,129 @@
     border: 1px solid #ddd;
     }
 
-    #zoom-warning {
-      position: absolute;
-      top: 20px;
-      left: 62.5%;
-      transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.95);
-      padding: 8px 16px;
-      border-radius: 6px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.2);
-      font-size: 14px;
-      font-weight: bold;
-      color: #333;
-      z-index: 999;
-      display: none; /* Hidden by default */
+    #geocoder-wrapper {
+      position: relative;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    #geocoder-center-group {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    #geocoder-section {
+      width: 300px;
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      z-index: 1;
+    }
+
+    #add-districts-button {
+      padding: 0 12px; 
+      border: 1px solid #ddd; 
+      background: white; 
+      border-radius: 4px; 
+      font-size: 18px; 
+      cursor: pointer;
+    }
+
+    #geocoder-right-wrapper {
+      display: flex;
+      flex-direction: row;
+      gap: 6px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;        /* ✅ allow wrapping if too narrow */
+    }
+
+    #panel-district-code {
+      font-size: 16px;
+      font-weight: 600;
+      min-height: 28px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      background-color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Override on wider screens: float to the right */
+    @media (min-width: 1330px) {
+      #geocoder-wrapper {
+        justify-content: center;
+      }
+
+      #geocoder-section {
+        position: relative;
+      }
+
+      #geocoder-right-wrapper {
+        position: absolute;
+        top: 0;
+        left: calc(50% + 160px);
+        display: flex;
+        flex-direction: row;     
+        align-items: center;     
+        gap: 12px;               
+        margin-top: 0;
+      }
+    }
+
+    #selected-district-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      max-width: 300px;
+    }
+
+    #selected-district-names {
+      min-height: 28px;
+      padding: 0 2px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    #selected-district-names > div {
+      line-height: 1;
+      padding: 4px 6px;
+    }
+
+    #info-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
     }
 
     .score-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      padding: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 10px;
+      margin-left: 20px;
+      margin-right: 20px;
     }
 
     .score-box {
+      width: 120px;
+      flex: 0 1 120px;
       background: #f7f6f6;
       border: 1px solid #ccc;
       border-radius: 6px;
       text-align: center;
       padding: 10px;
-      font-family: sans-serif;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-      
-      /* 🔒 NEW: Lock height to prevent flicker */
-      min-height: 70px;  /* Adjust as needed */
+      min-height: 70px;
       box-sizing: border-box;
     }
 
@@ -157,47 +246,119 @@
       box-shadow: 0 0 4px rgba(218,165,32,0.4); /* Optional glow */
     }
 
-    #panel-district-code {
-      font-size: 16px;
-      font-weight: 600;
-      min-height: 18px;
+    #map-section {
+      position: relative;
+      width: 100%;
+      height: 65vh; /* or whatever you want the map height to be */
     }
 
-    .panel-section-heading {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .panel-title {
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 4px;
-    }
-
-    .panel-subtitle {
-      font-size: 14px;
-      color: #555;
-      margin-bottom: 16px;
-    }
-
-    .panel-label {
-      font-size: 14px;
-      margin-bottom: 8px;
+    #map {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-color: #020f17;
     }
 
     #map-select {
       width: 100%;
-      padding: 6px;
+      padding: 5.5px;
       font-size: 14px;
       border: 1px solid #ddd;
       border-radius: 4px;
+      text-align: center;
     }
 
-    .divider {
-      border: none;
-      border-top: 1px solid #ddd;
-      margin: 24px 0;
+    #overlay-interactivity {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200px;
+      padding: 10px;
+      z-index: 11;
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+
+    /* When both panels are collapsed, move button to edge */
+    #overlay-interactivity.collapsed-left + #overlay-toggle-button {
+      left: 10px;
+    }
+
+    #overlay-interactivity.collapsed-left {
+      transform: translateX(-220px);
+    }
+
+    #overlay-legend {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 200px;
+      padding: 10px;
+      background: rgba(255,255,255,0.95);
+      z-index: 1;
+      font-size: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+      font-family: 'Be Vietnam Pro', sans-serif !important;
+    }
+
+    #overlay-legend.collapsed-left {
+      transform: translateX(-220px);
+    }
+
+    #legend { 
+      font-size: 14px;
+      font-family: 'Be Vietnam Pro', sans-serif !important;
+      box-shadow: 0 1px 2px rgba(0 0 0 0.1);
+      line-height: 18px;
+      height: max-content; /* Allows height to expand based on content */
+      width: max-content; /* Allows height to expand based on content */;
+    }
+    
+    #legend .legend-key {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+    vertical-align: middle;
+    }
+
+    /* Toggle button */
+    #overlay-toggle-button {
+      position: absolute;
+      top: 10px;
+      left: 230px;
+      z-index: 12;
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: left 0.3s ease;
+    }
+ 
+    #overlay-toggle-button.collapsed {
+      left: 10px;
+    }
+
+    #zoom-warning {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.95);
+      padding: 8px 16px;
+      border-radius: 6px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.2);
+      font-size: 14px;
+      font-weight: bold;
+      color: #333;
+      z-index: 999;
+      display: none;
     }
 
     .star-rating {
@@ -215,39 +376,45 @@
       color: gold;
     }
 
-    #overlay-faq {
+    #overlay-faq,
+    #overlay-compare {
       position: absolute;
-      top: 0;
-      left: -50%;
-      width: 40%;
-      height: 100%;
-      background-color: #f0f0f0;
-      border-left: 1px solid #ccc;
-      box-shadow: 2px 0 6px rgba(0, 0, 0, 0.05);
-      z-index: 1;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      transition: left 0.4s ease;
+      bottom: -40%;
+      left: 0;
+      width: 100%;
+      height: 40%;
+      background-color: white;
+      z-index: 100;
+      transition: bottom 0.4s ease;
+    }
+
+    #overlay-faq.open,
+    #overlay-compare.open {
+      bottom: 0;
+    }
+
+    #overlay-faq {
       overflow-y: auto;
     }
 
-    #overlay-faq.open {
-      left: 25%; /* Slides in from behind the static overlay (20% width) */
-    }
-
     .faq-header {
+      position: sticky;
+      top: 0;
+      background-color: white;
+      z-index: 99;
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-top: 7px;
       margin-bottom: 20px;
+      margin-left: 20px;
+      margin-right: 20px;
+      border-bottom: 1px solid #ddd;
     }
 
     .faq-title {
       font-size: 20px;
       font-weight: bold;
-      margin-left: 16px; /* or use padding-left instead */
     }
 
     #faq-close {
@@ -260,35 +427,17 @@
     }
     
     .faq-content {
-      margin-left: 16px; /* or use padding-left instead */
-    }
-
-    #overlay-compare {
-      position: absolute;
-      left: 0;
-      bottom: -35%; /* Hidden initially */
-      width: 72%;
-      transform: translateX(35%);
-      height: 30%;
-      background-color: white;
-      border-top: 1px solid #ccc;
-      box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
-      z-index: 3;
-      padding: 16px;
-      transition: bottom 0.4s ease;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-    }
-
-    #overlay-compare.open {
-      bottom: 0; /* Slide into view */
+      margin-left: 20px;
+      margin-right: 20px;
+      padding-bottom: 16px;
+      overflow-wrap: break-word;
     }
 
     .compare-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-top: 20px;
       margin-bottom: 12px;
     }
 
@@ -387,57 +536,62 @@
       padding: 0 4px;
     }
 
-    #selected-district-names {
-      background-color: white;
-      min-height: 28px;
-      padding: 0px 2px;
-      border-radius: 4px;
-      margin: 8px 0px;
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
+    #clear-selected-button {
+      margin-left: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      color: #666;
+      display: none; /* only shown conditionally */
     }
 
+    .compare-inner {
+      padding: 0 20px;
+      height: 100%;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .compare-table-scroll {
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    #compare-table {
+      margin-top: 10px;
+      min-width: 800px; /* or whatever width fits all columns neatly */
+      border-collapse: collapse;
+      width: 100%;
+    }
 
 </style>
 </head>
 <body>
 
-<div id="map-wrapper">
-  <div id="overlay-container">
-    <h1 class="panel-title">Find the Best Mobile Network</h1>
-    <p class="panel-subtitle">
-      Search by postcode or click on the map to explore network quality in your area.
-    </p>
-    <div id="geocoder-section" style="display: flex; gap: 6px;">
-      <div id="geocoder" style="flex: 1;"></div>
-      <button id="add-districts-button" title="Add" style="padding: 0 12px; border: 1px solid #ddd; background: white; border-radius: 4px; font-size: 18px; cursor: pointer;">
-        ➕
-      </button>
-    </div>
-
-    <div id="selected-district-names"></div>
-    
-      <div id="layer-switcher-section">
-        <p class="panel-label">Select Map Layer</p>
-        <select id="map-select">
-          <option value="district_boundaries">Show selected locations</option>
-          <option value="uk-postcode-districts">Best Provider</option>
-          <option value="score_vodafone">Vodafone</option>
-          <option value="score_ee">EE</option>
-          <option value="score_o2">O2</option>
-          <option value="score_3">Three</option>
-          <option value="score_geo">Geo Type [internal]</option>
-        </select>
-      </div> 
-      
-      <hr class="divider" />
-
-      <div id="info-section">
-        <div class="panel-section-heading" style="display: flex; justify-content: space-between; align-items: center;">
-          <span>Network scores</span>
-          <span id="panel-district-code"></span>
+<div id="page-container">
+  <div id="contents-wrapper">
+    <div id="top-container">
+      <h1 class="page-title">Mobile Network Quality</h1>
+      <p class="page-subtitle">Search by postcode or click on the map to explore mobile network quality in your area.</p>
+  
+      <div id="geocoder-wrapper">
+        <div id="geocoder-center-group">
+          <div id="geocoder-section">
+            <div id="geocoder"></div>
+            <button id="add-districts-button" title="Add">➕</button>
+          </div>
         </div>
+  
+        <div id="geocoder-right-wrapper">
+          <div id="panel-district-code"></div>
+          <div id="selected-district-wrapper">
+            <div id="selected-district-names"></div>
+            <div id="clear-selected-button">🗑️</div>
+          </div>
+        </div>
+      </div>
+          
+      <div id="info-section">
         <div id="pd" class="score-grid">
           <div class="score-box">
             <div class="operator-name">EE</div>
@@ -464,168 +618,190 @@
           Note: This result is at postcode area level
         </div>                      
       </div>
-
-      <button id="table-button" style="width: 100%; padding: 6px; font-size: 14px; margin-top: 6px; border: 1px solid #ddd; border-radius: 4px; background-color: white; cursor: pointer;">
-        Show results for all selected districts
-      </button>
-
-      <button id="faq-button" style="width: 100%; padding: 6px; font-size: 14px; margin-top: 6px; border: 1px solid #ddd; border-radius: 4px; background-color: white; cursor: pointer;">
-        FAQ
-      </button>     
-
-      <hr class="divider" />
-
-      <div id="legend-section">
-        <div id="legend"></div>
+    </div>
+  
+    <div id="map-section">
+      <div id="map"></div>
+  
+      <div id="overlay-interactivity">
+        <div id="layer-switcher-section">
+          <select id="map-select">
+            <option value="uk-postcode-districts">Best Provider</option>
+            <option value="district_boundaries">Show selected locations</option>
+            <option value="score_vodafone">Vodafone</option>
+            <option value="score_ee">EE</option>
+            <option value="score_o2">O2</option>
+            <option value="score_3">Three</option>
+            <option value="score_geo">Geo Type [internal]</option>
+          </select>
+        </div> 
+        <button id="table-button" style="width: 100%; padding: 6px; font-size: 14px; margin-top: 6px; border: 1px solid #ddd; border-radius: 4px; background-color: white; cursor: pointer;">
+          Districts results
+        </button>
+        <button id="faq-button" style="width: 100%; padding: 6px; font-size: 14px; margin-top: 6px; border: 1px solid #ddd; border-radius: 4px; background-color: white; cursor: pointer;">
+          FAQ
+        </button> 
       </div>
-  </div>
-
-  <div id="map"></div>
-
-  <div id="overlay-faq">
-    <div class="faq-header">
-      <span class="faq-title">Frequently Asked Questions</span>
-      <button id="faq-close">&times;</button>
-    </div>
-    <div class="faq-content">
-      <h3>What does network score represent?</h3>
-      <p>Description 1: Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-      <h3>How are star ratings calculated?</h3>
-      <p>Description 2: Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-      <h3>Why is my service provider not listed?</h3>
-      <p>Description 3: Nulla convallis egestas rhoncus.</p>
-      <h3>Why is my postcode not there?</h3>
-      <p>Description 4: Donec facilisis fermentum sem, ac viverra ante luctus vel.</p>
-    </div>
-  </div>
-  
-  <div id="zoom-warning">Zoom in to see network quality maps</div>
-
-  <div id="overlay-compare">
-    <div class="compare-header">
-      <span class="compare-title">Selected districts</span>
-      <button id="compare-close" style="font-size: 20px; background: none; border: none; cursor: pointer;">×</button>
-    </div>
-    <div class="compare-subtitle-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-      <div class="compare-subtitle">Select multiple districts to easily compare network scores and find the best service provider</div>
-      <button id="clear-all-button" title="Clear all" style="background: none; border: none; cursor: pointer; font-size: 12px; color: #555;">
-        🗑️ Clear Table
-      </button>
-    </div>
-    <table id="compare-table" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-      <colgroup>
-        <col style="width: 19%">
-        <col style="width: 19%">
-        <col style="width: 19%">
-        <col style="width: 19%">
-        <col style="width: 19%">
-        <col style="width: 5%">
-      </colgroup>
-      <thead>
-        <tr style="background-color: black; color: white;">
-          <th>District</th>
-          <th>
-            <div class="heading-label">
-              <span class="operator-name-label">EE</span>
-              <span id="avg-ee" class="avg-star"></span>
-            </div>
-          </th>
-          <th>
-            <div class="heading-label">
-              <span class="operator-name-label">O2</span>
-              <span id="avg-o2" class="avg-star"></span>
-            </div>
-          </th>
-          <th>
-            <div class="heading-label">
-              <span class="operator-name-label">Three</span>
-              <span id="avg-three" class="avg-star"></span>
-            </div>
-          </th>
-          <th>
-            <div class="heading-label">
-              <span class="operator-name-label">Vodafone</span>
-              <span id="avg-vodafone" class="avg-star"></span>
-            </div>
-          </th>
-          <th>Remove</th>
-        </tr>
-      </thead>
-      <tbody id="compare-table-body">
-        <tr style="background-color: #f0f0f0; color: black;">
-          <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <!-- Repeat 4 more rows -->
-          <tr style="background-color: #f0f0f0; color: black;">
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <!-- Repeat 4 more rows -->
-          <tr style="background-color: #f0f0f0; color: black;">
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <!-- Repeat 4 more rows -->
-          <tr style="background-color: #f0f0f0; color: black;">
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <!-- Repeat 4 more rows -->
-          <tr style="background-color: #f0f0f0; color: black;">
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>  
-      </tbody>
-    </table>
     
-  </div>
+      <button id="overlay-toggle-button" title="Toggle side panels">◀</button>
+
+      <div id="zoom-warning">Zoom in to see network quality maps</div>
+    </div>
+   
+    <div id="overlay-legend">
+      <div id="legend"></div>
+    </div>
   
+    <div id="overlay-faq">
+      <div class="faq-header">
+        <span class="faq-title">Frequently Asked Questions</span>
+        <button id="faq-close">&times;</button>
+      </div>
+      <div class="faq-content">
+        <h3>What does network score represent?</h3>
+        <p>Description 1: Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        <h3>How are star ratings calculated?</h3>
+        <p>Description 2: Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        <h3>Why is my service provider not listed?</h3>
+        <p>Description 3: Nulla convallis egestas rhoncus.</p>
+        <h3>Why is my postcode not there?</h3>
+        <p>Description 4: Donec facilisis fermentum sem, ac viverra ante luctus vel.</p>
+      </div>
+    </div>
+  
+    <div id="overlay-compare">
+      <div class="compare-inner">
+        <div class="compare-header">
+          <span class="compare-title">Selected districts</span>
+          <button id="compare-close" style="font-size: 20px; background: none; border: none; cursor: pointer;">×</button>
+        </div>
+        <div class="compare-subtitle-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <div class="compare-subtitle">Select multiple districts to easily compare network scores and find the best service provider</div>
+          <button id="clear-all-button" title="Clear all" style="background: none; border: none; cursor: pointer; font-size: 12px; color: #555;">
+            🗑️ Clear Table
+          </button>
+        </div>
+        <div class="compare-table-scroll">
+          <table id="compare-table" style="border-collapse: collapse; width: 100%;">
+            <colgroup>
+              <col style="width: 19%">
+              <col style="width: 19%">
+              <col style="width: 19%">
+              <col style="width: 19%">
+              <col style="width: 19%">
+              <col style="width: 5%">
+            </colgroup>
+            <thead>
+              <tr style="background-color: black; color: white;">
+                <th>District</th>
+                <th>
+                  <div class="heading-label">
+                    <span class="operator-name-label">EE</span>
+                    <span id="avg-ee" class="avg-star"></span>
+                  </div>
+                </th>
+                <th>
+                  <div class="heading-label">
+                    <span class="operator-name-label">O2</span>
+                    <span id="avg-o2" class="avg-star"></span>
+                  </div>
+                </th>
+                <th>
+                  <div class="heading-label">
+                    <span class="operator-name-label">Three</span>
+                    <span id="avg-three" class="avg-star"></span>
+                  </div>
+                </th>
+                <th>
+                  <div class="heading-label">
+                    <span class="operator-name-label">Vodafone</span>
+                    <span id="avg-vodafone" class="avg-star"></span>
+                  </div>
+                </th>
+                <th>Remove</th>
+              </tr>
+            </thead>
+            <tbody id="compare-table-body">
+              <tr style="background-color: #f0f0f0; color: black;">
+                <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <!-- Repeat 4 more rows -->
+                <tr style="background-color: #f0f0f0; color: black;">
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <!-- Repeat 4 more rows -->
+                <tr style="background-color: #f0f0f0; color: black;">
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <!-- Repeat 4 more rows -->
+                <tr style="background-color: #f0f0f0; color: black;">
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <!-- Repeat 4 more rows -->
+                <tr style="background-color: #f0f0f0; color: black;">
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>  
+            </tbody>
+          </table> 
+        </div>
+      </div>
+    </div>  
+  </div>
 </div>
+  
 
-<script> // this script loads the map with layer at given zoom/coordinates (alternatively can use a bounding box with map.fitBounds .. ) ======================================================
+<script> // FULL SCRIPT ==============================================================================================================================
     
+  // Initialie map  
   const ACCESS_TOKEN = 'pk.eyJ1IjoiYnJ5dGx5dCIsImEiOiJjajNnMmEwbzAwMDE1MzJxcDVoc2x6M2g4In0.Vi7r8DI0sqULLdEI7ZbhZQ' // personal access token
   mapboxgl.accessToken = ACCESS_TOKEN;
   const map = new mapboxgl.Map({
      container: 'map', // container id
      style: 'mapbox://styles/brytlyt/cm92lxlig008001sfferu9nez', // replace this with your style URL
      zoom: 7, // opens the map at a predefined zoom level
-     minZoom: 5, // ⬅️ hardcoded min zoom
-     maxZoom: 12.3,  // ⬅️ hardcoded max zoom
+     minZoom: 5, // hardcoded min zoom
+     maxZoom: 12.3,  // hardcoded max zoom
      center: [-1.22, 51.94], // center point of map at opening
-
-      // 👇 Add this block to restrict map movement
-      maxBounds: [
+     maxBounds: [
         [-11, 49.5], // Southwest corner [lng, lat]
         [2.5, 61]    // Northeast corner [lng, lat]
-      ]
+      ] // Restrict map movement
      });
 
   let multiSelectMode = false;
   let selectedDistricts = []; // Stores { code, feature }
+  let currentHighlightedArea = null; // Reuse this from your click/geocoder logic
+  let currentHighlightLayer = null;  // Store which layer the highlight is in
 
-// Display zoom pop-up when zoom lower than 7 (or whatever is the min zoom of the Mapbox style)
+  const clickableLayers = ['uk-postcode-districts','score_vodafone','score_ee','score_o2','score_3','score_geo','district_boundaries'];
+
+
+  // Display zoom pop-up when zoom lower than 7 (or whatever is the min zoom of the Mapbox style) ======================================================
   map.on('zoom', () => {
     const zoomWarning = document.getElementById('zoom-warning');
     if (map.getZoom() < 7) {
@@ -635,23 +811,10 @@
     }
   });
 
-  let currentHighlightedArea = null; // Reuse this from your click/geocoder logic
-  let currentHighlightLayer = null;  // Store which layer the highlight is in
+  // Add Navigation controls top right ===================================================================================================================
+  map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-  const clickableLayers = [
-      'uk-postcode-districts',
-      'score_vodafone',
-      'score_ee',
-      'score_o2',
-      'score_3',
-      'score_geo',
-      'district_boundaries'
-  ];
-
-// Add Navigation controls top right ======================================================
-  map.addControl(new mapboxgl.NavigationControl());
-
-// load the 5 default grey stars from very beginning    
+  // load the 5 default grey stars from very beginning    
   document.addEventListener('DOMContentLoaded', () => {
     ['stars-ee', 'stars-o2', 'stars-3', 'stars-vodafone'].forEach(starId => {
       renderGreyStars(starId);
@@ -676,407 +839,480 @@
   });
 
 
-// this script populates the legend box ======================================================
-map.on('load', () => {
+  // this script populates the legend box ======================================================
+  map.on('load', () => {
 
-  // Force the first layer to be visible
-  map.setLayoutProperty('district_boundaries', 'visibility', 'visible');
+    // Force the first layer to be visible
+    map.setLayoutProperty('uk-postcode-districts', 'visibility', 'visible');
 
-  // Hide the others
-  ['score_vodafone', 'score_ee', 'score_o2', 'score_3', 'score_geo', 'uk-postcode-districts'].forEach(layer => {
-  map.setLayoutProperty(layer, 'visibility', 'none');
-  });
+    // Hide the others
+    ['score_vodafone', 'score_ee', 'score_o2', 'score_3', 'score_geo', 'district_boundaries'].forEach(layer => {
+    map.setLayoutProperty(layer, 'visibility', 'none');
+    });
 
-  // Get reference to the legend container
-  const legend = document.getElementById('legend');
+    // Get reference to the legend container
+    const legend = document.getElementById('legend');
 
-  // Define legend content for different layers
-  const legends = {
-      'best-provider': {
-          title: 'Best Provider:',
-          layers: ['3', 'EE', 'O2', 'Vodafone', 'Tie'],
-          colors: ['#67217dbf', '#206873bf', '#081f4abe', '#d00100be', '#e2e2e2be']
-      },
-      'score_vodafone': {
+    // Define legend content for different layers
+    const legends = {
+        'best-provider': {
+            title: 'Best Provider:',
+            layers: ['3', 'EE', 'O2', 'Vodafone', 'Tie'],
+            colors: ['#67217dbf', '#206873bf', '#081f4abe', '#d00100be', '#e2e2e2be']
+        },
+        'score_vodafone': {
+            title: 'Network score:',
+            layers: ['90% - 100%', '80% - 89%', '70% - 79%', '60% - 69%', '50% - 59%', '0% - 49%', 'Not reportable'],
+            colors: ['#38761d', '#6aa84f', '#b6d7a8', '#f9ce01', '#ff9903','#f47901', '#000000']
+        },
+        'score_ee': {
+            title: 'Network score:',
+            layers: ['90% - 100%', '80% - 89%', '70% - 79%', '60% - 69%', '50% - 59%', '0% - 49%', 'Not reportable'],
+            colors: ['#38761d', '#6aa84f', '#b6d7a8', '#f9ce01', '#ff9903','#f47901', '#000000']
+        },
+        'score_o2': {
           title: 'Network score:',
-          layers: ['90% - 100%', '80% - 89%', '70% - 79%', '60% - 69%', '50% - 59%', '0% - 49%', 'Not reportable'],
-          colors: ['#38761d', '#6aa84f', '#b6d7a8', '#f9ce01', '#ff9903','#f47901', '#000000']
-      },
-      'score_ee': {
-          title: 'Network score:',
-          layers: ['90% - 100%', '80% - 89%', '70% - 79%', '60% - 69%', '50% - 59%', '0% - 49%', 'Not reportable'],
-          colors: ['#38761d', '#6aa84f', '#b6d7a8', '#f9ce01', '#ff9903','#f47901', '#000000']
-      },
-      'score_o2': {
-         title: 'Network score:',
-          layers: ['90% - 100%', '80% - 89%', '70% - 79%', '60% - 69%', '50% - 59%', '0% - 49%', 'Not reportable'],
-          colors: ['#38761d', '#6aa84f', '#b6d7a8', '#f9ce01', '#ff9903','#f47901', '#000000']
-      },
-      'score_3': {
-          title: 'Network score:',
-          layers: ['90% - 100%', '80% - 89%', '70% - 79%', '60% - 69%', '50% - 59%', '0% - 49%', 'Not reportable'],
-          colors: ['#38761d', '#6aa84f', '#b6d7a8', '#f9ce01', '#ff9903','#f47901', '#000000']
-      },
-      'score_geo': {
-          title: 'Score reportability:',
-          layers: ['Postal District', 'Postal Area'],
-          colors: ['#50b4ad', '#edc626']
-      }
-  };
+            layers: ['90% - 100%', '80% - 89%', '70% - 79%', '60% - 69%', '50% - 59%', '0% - 49%', 'Not reportable'],
+            colors: ['#38761d', '#6aa84f', '#b6d7a8', '#f9ce01', '#ff9903','#f47901', '#000000']
+        },
+        'score_3': {
+            title: 'Network score:',
+            layers: ['90% - 100%', '80% - 89%', '70% - 79%', '60% - 69%', '50% - 59%', '0% - 49%', 'Not reportable'],
+            colors: ['#38761d', '#6aa84f', '#b6d7a8', '#f9ce01', '#ff9903','#f47901', '#000000']
+        },
+        'score_geo': {
+            title: 'Score reportability:',
+            layers: ['Postal District', 'Postal Area'],
+            colors: ['#50b4ad', '#edc626']
+        },
+        'district_boundaries': {
+            title: 'District:',
+            layers: ['Selected', 'Not selected'],
+            colors: ['#eec463', '#ffffff']
+        }
+    };
 
-  // Add your dropdown change event here
-document.getElementById('map-select').addEventListener('change', function () {
-  const selectedLayer = this.value;
+    // Add your dropdown change event here
+    document.getElementById('map-select').addEventListener('change', function () {
+      const selectedLayer = this.value;
 
-  // Show selected layer
-  const allLayers = ['uk-postcode-districts', 'score_vodafone', 'score_ee', 'score_o2', 'score_3', 'score_geo', 'district_boundaries'];
-  allLayers.forEach(layer => {
-    map.setLayoutProperty(layer, 'visibility', layer === selectedLayer ? 'visible' : 'none');
-  });
+      // Show selected layer
+      const allLayers = ['uk-postcode-districts', 'score_vodafone', 'score_ee', 'score_o2', 'score_3', 'score_geo', 'district_boundaries'];
+      allLayers.forEach(layer => {
+        map.setLayoutProperty(layer, 'visibility', layer === selectedLayer ? 'visible' : 'none');
+      });
 
-  // Always update fill visibility based on state
-  updateDistrictFillLayer();
-  updateHighlightOutlineLayer();
+      // Always update fill visibility based on state
+      updateDistrictFillLayer();
+      updateHighlightOutlineLayer();
 
-  // Update legend
-  const legendKeyMap = {
-    'uk-postcode-districts': 'best-provider',
-    'score_vodafone': 'score_vodafone',
-    'score_ee': 'score_ee',
-    'score_o2': 'score_o2',
-    'score_3': 'score_3',
-    'score_geo': 'score_geo'
-  };
-  updateLegend(legendKeyMap[selectedLayer]);
+      // Update legend
+      const legendKeyMap = {
+        'uk-postcode-districts': 'best-provider',
+        'score_vodafone': 'score_vodafone',
+        'score_ee': 'score_ee',
+        'score_o2': 'score_o2',
+        'score_3': 'score_3',
+        'score_geo': 'score_geo',
+        'district_boundaries': 'district_boundaries'
+      };
+      updateLegend(legendKeyMap[selectedLayer]);
 
-  // Toggle label layers (if added)
-  const labelLayers = ['score_vodafone_labels', 'score_ee_labels', 'score_o2_labels', 'score_3_labels'];
-  labelLayers.forEach(label => {
-    const visible = (selectedLayer + '_labels') === label;
-    if (map.getLayer(label)) {
-      map.setLayoutProperty(label, 'visibility', visible ? 'visible' : 'none');
+      // Toggle label layers (if added)
+      const labelLayers = ['score_vodafone_labels', 'score_ee_labels', 'score_o2_labels', 'score_3_labels'];
+      labelLayers.forEach(label => {
+        const visible = (selectedLayer + '_labels') === label;
+        if (map.getLayer(label)) {
+          map.setLayoutProperty(label, 'visibility', visible ? 'visible' : 'none');
+        }
+      });
+
+    })
+
+    // Function to update the legend dynamically
+    function updateLegend(layerId) {
+      const legend = document.getElementById('legend');
+      legend.innerHTML = ''; // Clear existing content
+
+      const legendData = legends[layerId];
+      if (!legendData) return;
+
+      // Add title
+      const title = document.createElement('div');
+      title.className = 'legend-title';
+      title.innerHTML = `${legendData.title}`;
+      legend.appendChild(title);
+
+      // Add each color/label item
+      legendData.layers.forEach((label, i) => {
+        const color = legendData.colors[i];
+        const item = document.createElement('div');
+
+        const key = document.createElement('span');
+        key.className = 'legend-key';
+        key.style.backgroundColor = color;
+
+        const value = document.createElement('span');
+        value.textContent = label;
+
+        item.appendChild(key);
+        item.appendChild(value);
+        legend.appendChild(item);
+      });
     }
+
+      // Initialize legend on first load
+    const initialLayer = document.getElementById('map-select').value;
+    const legendKeyMap = {
+      'uk-postcode-districts': 'best-provider',
+      'score_vodafone': 'score_vodafone',
+      'score_ee': 'score_ee',
+      'score_o2': 'score_o2',
+      'score_3': 'score_3',
+      'score_geo': 'score_geo',
+      'district_boundaries': 'district_boundaries'
+    };
+    updateLegend(legendKeyMap[initialLayer]);
+
   });
 
-})
-
-// Function to update the legend dynamically
-function updateLegend(layerId) {
-  const legend = document.getElementById('legend');
-  legend.innerHTML = ''; // Clear existing content
-
-  const legendData = legends[layerId];
-  if (!legendData) return;
-
-  // Add title
-  const title = document.createElement('div');
-  title.className = 'legend-title';
-  title.innerHTML = `${legendData.title}`;
-  legend.appendChild(title);
-
-  // Add each color/label item
-  legendData.layers.forEach((label, i) => {
-    const color = legendData.colors[i];
-    const item = document.createElement('div');
-
-    const key = document.createElement('span');
-    key.className = 'legend-key';
-    key.style.backgroundColor = color;
-
-    const value = document.createElement('span');
-    value.textContent = label;
-
-    item.appendChild(key);
-    item.appendChild(value);
-    legend.appendChild(item);
-  });
-}
-
-  // Initialize legend on first load
-const initialLayer = document.getElementById('map-select').value;
-const legendKeyMap = {
-  'uk-postcode-districts': 'best-provider',
-  'score_vodafone': 'score_vodafone',
-  'score_ee': 'score_ee',
-  'score_o2': 'score_o2',
-  'score_3': 'score_3',
-  'score_geo': 'score_geo'
-};
-updateLegend(legendKeyMap[initialLayer]);
-
-});
-
-// this script changes the cursor to default arrow ======================================================
+  // this script changes the cursor to default arrow ===================================================================================================
   map.getCanvas().style.cursor = 'default';
 
 
-// this script should load the search interactivity ======================================================
-// Add Mapbox GL Geocoder plugin
-const geocoder = new MapboxGeocoder({
-accessToken: mapboxgl.accessToken,
-mapboxgl: mapboxgl,
-flyTo: false, // need to manually deactive it if we want to customize the fly-to function
-marker: false, // No need for marker if highlighting a polygon
-placeholder: "Search UK postcode...",
-countries: 'gb',       // Restrict to UK
-types: 'postcode'      // Limit to postcode results only
-});
+  // this script should load the search interactivity ==================================================================================================
+  // Add Mapbox GL Geocoder plugin
+  const geocoder = new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken,
+    mapboxgl: mapboxgl,
+    flyTo: false, // need to manually deactive it if we want to customize the fly-to function
+    marker: false, // No need for marker if highlighting a polygon
+    placeholder: "Search UK postcode...",
+    countries: 'gb',       // Restrict to UK
+    types: 'postcode'      // Limit to postcode results only
+  });
 
-// Add geocoder to a custom container in the overlay
-document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
+  // Add geocoder to a custom container in the overlay
+  document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
 
-// this script should highlight the polygon ======================================================
-// Listen for result and highlight matching polygon
-geocoder.on('result', (e) => {
-  const postcode = e.result.text.toUpperCase();
-  const postcodeDistrict = postcode.match(/^[A-Z]{1,2}\d{1,2}/)[0];
+  // this script should highlight the polygon ==========================================================================================================
+  // Listen for result and highlight matching polygon
+  geocoder.on('result', (e) => {
+    const postcode = e.result.text.toUpperCase();
+    const postcodeDistrict = postcode.match(/^[A-Z]{1,2}\d{1,2}/)[0];
 
-  // Highlight outline
-  map.setFilter('highlight-outline', [
-    '==',
-    ['get', 'DISTRICT_CODE'],
-    postcodeDistrict
-  ]);
-  map.setLayoutProperty('highlight-outline', 'visibility', 'visible');
+    // Highlight outline
+    map.setFilter('highlight-outline', [
+      '==',
+      ['get', 'DISTRICT_CODE'],
+      postcodeDistrict
+    ]);
+    map.setLayoutProperty('highlight-outline', 'visibility', 'visible');
 
-  // Fly to result
-  if (e.result.center) {
-    map.flyTo({ center: e.result.center, zoom: 11 });
-  }
-
-  // Wait for map to finish rendering
-  map.once('moveend', () => {
-    const layersToQuery = [
-      'uk-postcode-districts',
-      'score_vodafone',
-      'score_ee',
-      'score_o2',
-      'score_3',
-      'score_geo',
-      'district_boundaries'
-    ];
-
-    let match = null;
-    for (const layer of layersToQuery) {
-      const visibility = map.getLayoutProperty(layer, 'visibility');
-      if (visibility !== 'visible') continue;
-
-      const features = map.queryRenderedFeatures({
-        layers: [layer],
-        filter: ['==', ['get', 'DISTRICT_CODE'], postcodeDistrict]
-      });
-
-      if (features.length > 0) {
-        match = features[0];
-        currentHighlightLayer = layer;
-        break;
-      }
+    // Fly to result
+    if (e.result.center) {
+      map.flyTo({ center: e.result.center, zoom: 11 });
     }
 
-    if (match) {
-      renderInfoBox(match.properties);
+    // Wait for map to finish rendering
+    map.once('moveend', () => {
+      const layersToQuery = [
+        'uk-postcode-districts',
+        'score_vodafone',
+        'score_ee',
+        'score_o2',
+        'score_3',
+        'score_geo',
+        'district_boundaries'
+      ];
 
-      if (multiSelectMode) {
-      const isAlreadySelected = selectedDistricts.some(d => d.code === postcodeDistrict);
+      let match = null;
+      for (const layer of layersToQuery) {
+        const visibility = map.getLayoutProperty(layer, 'visibility');
+        if (visibility !== 'visible') continue;
 
-      if (!isAlreadySelected && selectedDistricts.length < 5) {
-        selectedDistricts.push({ code: postcodeDistrict, feature: match });
+        const features = map.queryRenderedFeatures({
+          layers: [layer],
+          filter: ['==', ['get', 'DISTRICT_CODE'], postcodeDistrict]
+        });
+
+        if (features.length > 0) {
+          match = features[0];
+          currentHighlightLayer = layer;
+          break;
+        }
+      }
+
+      if (match) {
+        renderInfoBox(match.properties);
+
+        if (multiSelectMode) {
+        const isAlreadySelected = selectedDistricts.some(d => d.code === postcodeDistrict);
+
+        if (!isAlreadySelected && selectedDistricts.length < 5) {
+          selectedDistricts.push({ code: postcodeDistrict, feature: match });
+          renderSelectedDistricts();
+          compareRows = selectedDistricts.map(d => featureToRow(d.feature));
+          updateCompareTable();
+          updateDistrictFillLayer();
+          updateHighlightOutlineLayer();
+        }
+      } else {
+        selectedDistricts = [{ code: postcodeDistrict, feature: match }];
         renderSelectedDistricts();
-        compareRows = selectedDistricts.map(d => featureToRow(d.feature));
+        compareRows = [featureToRow(match)];
         updateCompareTable();
         updateDistrictFillLayer();
         updateHighlightOutlineLayer();
       }
-    } else {
-      selectedDistricts = [{ code: postcodeDistrict, feature: match }];
-      renderSelectedDistricts();
-      compareRows = [featureToRow(match)];
-      updateCompareTable();
-      updateDistrictFillLayer();
-      updateHighlightOutlineLayer();
-    }
 
-    } else {
-      ['score-3', 'score-ee', 'score-o2', 'score-vodafone'].forEach(id => {
-        const el = document.getElementById(id);
-        el.textContent = '—';
-        el.closest('.score-box').classList.remove('highlight');
-      });
-      currentHighlightLayer = null;
-      document.getElementById('panel-district-code').textContent = '';
-    }
-  });
-});
-
-
-geocoder.on('clear', () => {
-// Hide and clear filter
-map.setLayoutProperty('highlight-outline', 'visibility', 'none');
-map.setFilter('highlight-outline', ['==', ['get', 'DISTRICT_CODE'], '___HIDDEN___']);
-currentHighlightedArea = null;
-currentHighlightLayer = null;
-['score-3', 'score-ee', 'score-o2', 'score-vodafone'].forEach(id => {
-  const el = document.getElementById(id);
-  el.textContent = '—';
-  el.closest('.score-box').classList.remove('highlight');
-  const starId = 'stars-' + id.split('-')[1];
-  renderGreyStars(starId);
-});
-document.getElementById('panel-district-code').textContent = '';
-document.getElementById('district-note').style.visibility = 'hidden';
-});
-
-// this script enable outline highlight on mouseclick. works across layers and second click remove outline ======================================================
-
-clickableLayers.forEach(layerId => {
-map.on('click', layerId, (e) => {
-  const feature = e.features[0];
-  const areaCode = feature.properties.DISTRICT_CODE;
-
-  if (multiSelectMode) {
-    const isAlreadySelected = selectedDistricts.some(d => d.code === areaCode);
-    if (isAlreadySelected) {
-      // Remove from list
-      selectedDistricts = selectedDistricts.filter(d => d.code !== areaCode);
-      renderSelectedDistricts();
-      compareRows = selectedDistricts.map(d => featureToRow(d.feature));
-      updateCompareTable();
-
-      // Also remove highlight
-      if (currentHighlightedArea === areaCode) {
-        map.setLayoutProperty('highlight-outline', 'visibility', 'none');
-        map.setFilter('highlight-outline', ['==', ['get', 'DISTRICT_CODE'], '___HIDDEN___']);
-        currentHighlightedArea = null;
+      } else {
+        ['score-3', 'score-ee', 'score-o2', 'score-vodafone'].forEach(id => {
+          const el = document.getElementById(id);
+          el.textContent = '—';
+          el.closest('.score-box').classList.remove('highlight');
+        });
         currentHighlightLayer = null;
+        document.getElementById('panel-district-code').textContent = '';
       }
+    });
+  });
 
-      return; // Skip the rest
-    }
-  } else if (!multiSelectMode && currentHighlightedArea === areaCode) {
-    // Single-select deselection logic
-    currentHighlightedArea = null;
-    currentHighlightLayer = null;
-    selectedDistricts = [];
-    compareRows = [];
-    renderSelectedDistricts();
-    updateCompareTable();
 
+  geocoder.on('clear', () => {
+    // Hide and clear filter
     map.setLayoutProperty('highlight-outline', 'visibility', 'none');
     map.setFilter('highlight-outline', ['==', ['get', 'DISTRICT_CODE'], '___HIDDEN___']);
-    map.setFilter('district_fill', ['in', ['get', 'DISTRICT_CODE'], ['literal', []]]);
-    return;
-  }
+    currentHighlightedArea = null;
+    currentHighlightLayer = null;
+    ['score-3', 'score-ee', 'score-o2', 'score-vodafone'].forEach(id => {
+      const el = document.getElementById(id);
+      el.textContent = '—';
+      el.closest('.score-box').classList.remove('highlight');
+      const starId = 'stars-' + id.split('-')[1];
+      renderGreyStars(starId);
+    });
+    document.getElementById('panel-district-code').textContent = '';
+    document.getElementById('district-note').style.visibility = 'hidden';
+  });
 
-  if (multiSelectMode) {
-    const isAlreadySelected = selectedDistricts.some(d => d.code === areaCode);
+  // this script enable outline highlight on mouseclick. works across layers and second click remove outline ======================================================
 
-    if (isAlreadySelected) {
-      selectedDistricts = selectedDistricts.filter(d => d.code !== areaCode);
-      renderSelectedDistricts();
-      compareRows = selectedDistricts.map(d => featureToRow(d.feature));
-      updateCompareTable();
-      return; // stop here, nothing else to do
-    }
-  }
+  clickableLayers.forEach(layerId => {
+    map.on('click', layerId, (e) => {
+      const feature = e.features[0];
+      const areaCode = feature.properties.DISTRICT_CODE;
+
+      if (multiSelectMode) {
+        const isAlreadySelected = selectedDistricts.some(d => d.code === areaCode);
+        if (isAlreadySelected) {
+          // Remove from list
+          selectedDistricts = selectedDistricts.filter(d => d.code !== areaCode);
+          renderSelectedDistricts();
+          compareRows = selectedDistricts.map(d => featureToRow(d.feature));
+          updateCompareTable();
+
+          // Also remove highlight
+          if (currentHighlightedArea === areaCode) {
+            map.setLayoutProperty('highlight-outline', 'visibility', 'none');
+            map.setFilter('highlight-outline', ['==', ['get', 'DISTRICT_CODE'], '___HIDDEN___']);
+            currentHighlightedArea = null;
+            currentHighlightLayer = null;
+          }
+
+          return; // Skip the rest
+        }
+      } else if (!multiSelectMode && currentHighlightedArea === areaCode) {
+        // Single-select deselection logic
+        currentHighlightedArea = null;
+        currentHighlightLayer = null;
+        selectedDistricts = [];
+        compareRows = [];
+        renderSelectedDistricts();
+        updateCompareTable();
+
+        map.setLayoutProperty('highlight-outline', 'visibility', 'none');
+        map.setFilter('highlight-outline', ['==', ['get', 'DISTRICT_CODE'], '___HIDDEN___']);
+        map.setFilter('district_fill', ['in', ['get', 'DISTRICT_CODE'], ['literal', []]]);
+        return;
+      }
+
+      currentHighlightedArea = areaCode;
+      currentHighlightLayer = layerId;
+
+      map.setFilter('highlight-outline', [
+        '==',
+        ['get', 'DISTRICT_CODE'],
+        areaCode
+      ]);
+      map.setLayoutProperty('highlight-outline', 'visibility', 'visible');
+
+      if (multiSelectMode) {
+      if (!selectedDistricts.includes(areaCode) && selectedDistricts.length < 5) {
+          selectedDistricts.push({ code: areaCode, feature });
+          renderSelectedDistricts();
+          compareRows = selectedDistricts.map(d => featureToRow(d.feature));
+          updateCompareTable();
+        }
+      } else {
+        selectedDistricts = [];
+        renderSelectedDistricts();
+        compareRows = [featureToRow(feature)];
+        updateCompareTable();
+      }
+    });
+  });
 
 
-  currentHighlightedArea = areaCode;
-  currentHighlightLayer = layerId;
-
-  map.setFilter('highlight-outline', [
-    '==',
-    ['get', 'DISTRICT_CODE'],
-    areaCode
-  ]);
-  map.setLayoutProperty('highlight-outline', 'visibility', 'visible');
-
-  if (multiSelectMode) {
-  if (!selectedDistricts.includes(areaCode) && selectedDistricts.length < 5) {
-      selectedDistricts.push({ code: areaCode, feature });
-      renderSelectedDistricts();
-      compareRows = selectedDistricts.map(d => featureToRow(d.feature));
-      updateCompareTable();
-    }
-  } else {
-    selectedDistricts = [];
-    renderSelectedDistricts();
-    compareRows = [featureToRow(feature)];
-    updateCompareTable();
-  }
-});
-});
-
-
-// this script populates the Dynamic content box ======================================================
+  // this script populates the Dynamic content box ======================================================
   // Get reference to the information window element
-  const infoWindow = document.getElementById('pd');
   const dataLayers = [
-'uk-postcode-districts',
-'score_vodafone',
-'score_ee',
-'score_o2',
-'score_3',
-'score_geo',
-'district_boundaries'
-];
+  'uk-postcode-districts',
+  'score_vodafone',
+  'score_ee',
+  'score_o2',
+  'score_3',
+  'score_geo',
+  'district_boundaries'
+  ];
 
-// render 5 grey star
-function renderGreyStars(starContainerId) {
-const starEl = document.getElementById(starContainerId);
-if (!starEl) return;
-starEl.innerHTML = '';
-for (let i = 0; i < 5; i++) {
-  const starSpan = document.createElement('span');
-  starSpan.classList.add('star');
-  starSpan.textContent = '★';
-  starEl.appendChild(starSpan);
-}
-}
+  // render 5 grey star
+  function renderGreyStars(starContainerId) {
+    const starEl = document.getElementById(starContainerId);
+    if (!starEl) return;
+    starEl.innerHTML = '';
+    for (let i = 0; i < 5; i++) {
+      const starSpan = document.createElement('span');
+      starSpan.classList.add('star');
+      starSpan.textContent = '★';
+      starEl.appendChild(starSpan);
+    }
+  }
 
-// Render function for info content
-function renderInfoBox(hoverFeature = null) {
-  const panelCodeEl = document.getElementById('panel-district-code');
+  // Render function for info content
+  function renderInfoBox(hoverFeature = null) {
+    const panelCodeEl = document.getElementById('panel-district-code');
 
-  // CASE 1: Hover only
-  if (!compareRows.length && hoverFeature) {
-    const props = hoverFeature.properties;
-    panelCodeEl.textContent = props.DISTRICT_CODE || '';
+    // CASE 1: Hover only
+    if (!compareRows.length && hoverFeature) {
+      const props = hoverFeature.properties;
+      panelCodeEl.textContent = props.DISTRICT_CODE || '';
 
-    const operatorScores = {
-      ee: props.network_score_ee,
-      o2: props.network_score_o2,
-      '3': props.network_score_3,
-      vodafone: props.network_score_vodafone
+      const operatorScores = {
+        ee: props.network_score_ee,
+        o2: props.network_score_o2,
+        '3': props.network_score_3,
+        vodafone: props.network_score_vodafone
+      };
+
+      let maxScore = -1;
+      Object.values(operatorScores).forEach(score => {
+        if (typeof score === 'number' && !isNaN(score)) {
+          maxScore = Math.max(maxScore, score);
+        }
+      });
+
+      Object.entries(operatorScores).forEach(([key, score]) => {
+        const scoreEl = document.getElementById(`score-${key}`);
+        const starEl = document.getElementById(`stars-${key}`);
+        const boxEl = scoreEl.closest('.score-box');
+
+        if (typeof score !== 'number' || isNaN(score)) {
+          scoreEl.textContent = '—';
+          renderGreyStars(`stars-${key}`);
+          boxEl.classList.remove('highlight');
+          return;
+        }
+
+        const percent = Math.floor(score * 100);
+        scoreEl.textContent = `${percent}%`;
+
+        let stars = 0;
+        if (score >= 0.86) stars = 5;
+        else if (score >= 0.80) stars = 4;
+        else if (score >= 0.70) stars = 3;
+        else if (score >= 0.60) stars = 2;
+        else if (score >= 0.01) stars = 1;
+
+        starEl.innerHTML = '';
+        for (let i = 1; i <= 5; i++) {
+          const s = document.createElement('span');
+          s.className = 'star' + (i <= stars ? ' gold' : '');
+          s.textContent = '★';
+          starEl.appendChild(s);
+        }
+
+        if (score === maxScore) {
+          boxEl.classList.add('highlight');
+        } else {
+          boxEl.classList.remove('highlight');
+        }
+      });
+
+      document.getElementById('district-note').style.visibility =
+        props.is_district_score === 0 ? 'visible' : 'hidden';
+
+      return;
+    }
+
+    // CASE 2: Selection
+    if (!compareRows.length) {
+      ['ee', 'o2', '3', 'vodafone'].forEach(key => {
+        document.getElementById(`score-${key}`).textContent = '—';
+        renderGreyStars(`stars-${key}`);
+        document.getElementById(`score-${key}`).closest('.score-box').classList.remove('highlight');
+      });
+      panelCodeEl.textContent = '';
+      document.getElementById('district-note').style.visibility = 'hidden';
+      return;
+    }
+
+    const isMulti = compareRows.length > 1;
+    panelCodeEl.textContent = isMulti ? 'AVG' : compareRows[0][0];
+
+    const operatorIndices = {
+      ee: 1,
+      o2: 2,
+      '3': 3,
+      vodafone: 4
     };
 
     let maxScore = -1;
-    Object.values(operatorScores).forEach(score => {
-      if (typeof score === 'number' && !isNaN(score)) {
-        maxScore = Math.max(maxScore, score);
-      }
+    const operatorAverages = {};
+
+    Object.entries(operatorIndices).forEach(([key, colIndex]) => {
+      const scores = compareRows.map(row => row[colIndex])
+        .filter(score => typeof score === 'number' && !isNaN(score));
+
+      const avgScore = scores.length
+        ? scores.reduce((a, b) => a + b, 0) / scores.length
+        : null;
+
+      operatorAverages[key] = avgScore;
+      if (avgScore !== null) maxScore = Math.max(maxScore, avgScore);
     });
 
-    Object.entries(operatorScores).forEach(([key, score]) => {
+    Object.entries(operatorAverages).forEach(([key, avgScore]) => {
       const scoreEl = document.getElementById(`score-${key}`);
       const starEl = document.getElementById(`stars-${key}`);
       const boxEl = scoreEl.closest('.score-box');
 
-      if (typeof score !== 'number' || isNaN(score)) {
+      if (avgScore === null) {
         scoreEl.textContent = '—';
         renderGreyStars(`stars-${key}`);
         boxEl.classList.remove('highlight');
         return;
       }
 
-      const percent = Math.floor(score * 100);
+      const percent = Math.floor(avgScore * 100);
       scoreEl.textContent = `${percent}%`;
 
       let stars = 0;
-      if (score >= 0.86) stars = 5;
-      else if (score >= 0.80) stars = 4;
-      else if (score >= 0.70) stars = 3;
-      else if (score >= 0.60) stars = 2;
-      else if (score >= 0.01) stars = 1;
+      if (avgScore >= 0.86) stars = 5;
+      else if (avgScore >= 0.80) stars = 4;
+      else if (avgScore >= 0.70) stars = 3;
+      else if (avgScore >= 0.60) stars = 2;
+      else if (avgScore >= 0.01) stars = 1;
 
       starEl.innerHTML = '';
       for (let i = 1; i <= 5; i++) {
@@ -1086,395 +1322,329 @@ function renderInfoBox(hoverFeature = null) {
         starEl.appendChild(s);
       }
 
-      if (score === maxScore) {
+      if (avgScore === maxScore) {
         boxEl.classList.add('highlight');
       } else {
         boxEl.classList.remove('highlight');
       }
     });
 
-    document.getElementById('district-note').style.visibility =
-      props.is_district_score === 0 ? 'visible' : 'hidden';
-
-    return;
+    // Show note if any selected district is area-level
+    const anyIsAreaLevel = selectedDistricts.some(d => d.feature.properties?.is_district_score === 0);
+    document.getElementById('district-note').style.visibility = anyIsAreaLevel ? 'visible' : 'hidden';
   }
 
-  // CASE 2: Selection
-  if (!compareRows.length) {
-    ['ee', 'o2', '3', 'vodafone'].forEach(key => {
-      document.getElementById(`score-${key}`).textContent = '—';
-      renderGreyStars(`stars-${key}`);
-      document.getElementById(`score-${key}`).closest('.score-box').classList.remove('highlight');
+
+  // Central handler for mousemove ===================================================================================================================
+  map.on('mousemove', (e) => {
+    // If a polygon is currently highlighted, show its info only (and ignore hover)
+    if (currentHighlightedArea && currentHighlightLayer) {
+      const features = map.queryRenderedFeatures({
+        layers: [currentHighlightLayer],
+        filter: ['==', ['get', 'DISTRICT_CODE'], currentHighlightedArea]
+      });
+
+      if (features.length > 0) {
+        renderInfoBox(features[0].properties);
+      }
+      return; // Do not show hover info
+    }
+
+    // No highlight active: show hovered feature
+    const hoveredFeatures = map.queryRenderedFeatures(e.point, {
+      layers: dataLayers
     });
-    panelCodeEl.textContent = '';
-    document.getElementById('district-note').style.visibility = 'hidden';
-    return;
-  }
 
-  const isMulti = compareRows.length > 1;
-  panelCodeEl.textContent = isMulti ? 'AVG' : compareRows[0][0];
-
-  const operatorIndices = {
-    ee: 1,
-    o2: 2,
-    '3': 3,
-    vodafone: 4
-  };
-
-  let maxScore = -1;
-  const operatorAverages = {};
-
-  Object.entries(operatorIndices).forEach(([key, colIndex]) => {
-    const scores = compareRows.map(row => row[colIndex])
-      .filter(score => typeof score === 'number' && !isNaN(score));
-
-    const avgScore = scores.length
-      ? scores.reduce((a, b) => a + b, 0) / scores.length
-      : null;
-
-    operatorAverages[key] = avgScore;
-    if (avgScore !== null) maxScore = Math.max(maxScore, avgScore);
-  });
-
-  Object.entries(operatorAverages).forEach(([key, avgScore]) => {
-    const scoreEl = document.getElementById(`score-${key}`);
-    const starEl = document.getElementById(`stars-${key}`);
-    const boxEl = scoreEl.closest('.score-box');
-
-    if (avgScore === null) {
-      scoreEl.textContent = '—';
-      renderGreyStars(`stars-${key}`);
-      boxEl.classList.remove('highlight');
-      return;
-    }
-
-    const percent = Math.floor(avgScore * 100);
-    scoreEl.textContent = `${percent}%`;
-
-    let stars = 0;
-    if (avgScore >= 0.86) stars = 5;
-    else if (avgScore >= 0.80) stars = 4;
-    else if (avgScore >= 0.70) stars = 3;
-    else if (avgScore >= 0.60) stars = 2;
-    else if (avgScore >= 0.01) stars = 1;
-
-    starEl.innerHTML = '';
-    for (let i = 1; i <= 5; i++) {
-      const s = document.createElement('span');
-      s.className = 'star' + (i <= stars ? ' gold' : '');
-      s.textContent = '★';
-      starEl.appendChild(s);
-    }
-
-    if (avgScore === maxScore) {
-      boxEl.classList.add('highlight');
+    if (hoveredFeatures.length > 0) {
+      renderInfoBox(hoveredFeatures[0]);
     } else {
-      boxEl.classList.remove('highlight');
+      ['score-3', 'score-ee', 'score-o2', 'score-vodafone'].forEach(id => {
+        const el = document.getElementById(id);
+        el.textContent = '—';
+        el.closest('.score-box').classList.remove('highlight');
+        const starId = 'stars-' + id.split('-')[1];
+        renderGreyStars(starId);
+      });
+      document.getElementById('panel-district-code').textContent = '';
+      document.getElementById('district-note').style.visibility = 'hidden';
     }
   });
 
-  // Show note if any selected district is area-level
-  const anyIsAreaLevel = selectedDistricts.some(d => d.feature.properties?.is_district_score === 0);
-  document.getElementById('district-note').style.visibility = anyIsAreaLevel ? 'visible' : 'hidden';
-}
+  // Open FAQ overlay by pressing button
+    document.getElementById('faq-button').addEventListener('click', () => {
+    const faqOverlay = document.getElementById('overlay-faq');
+    const compareOverlay = document.getElementById('overlay-compare');
 
+    // Close compare if open
+    if (compareOverlay.classList.contains('open')) {
+      compareOverlay.classList.remove('open');
+    }
 
-
-
-
-// Central handler for mousemove
-map.on('mousemove', (e) => {
-// If a polygon is currently highlighted, show its info only (and ignore hover)
-if (currentHighlightedArea && currentHighlightLayer) {
-  const features = map.queryRenderedFeatures({
-    layers: [currentHighlightLayer],
-    filter: ['==', ['get', 'DISTRICT_CODE'], currentHighlightedArea]
+    // Toggle FAQ
+    faqOverlay.classList.toggle('open');
   });
 
-  if (features.length > 0) {
-    renderInfoBox(features[0].properties);
+  // close FAQ overlay 
+  document.getElementById('faq-close').addEventListener('click', () => {
+  document.getElementById('overlay-faq').classList.remove('open');
+  });
+
+  // close FAQ overlay by pressing ESC
+  document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' || e.key === 'Esc') {
+    const faqOverlay = document.getElementById('overlay-faq');
+    faqOverlay.classList.remove('open');
   }
-  return; // Do not show hover info
-}
-
-// No highlight active: show hovered feature
-const hoveredFeatures = map.queryRenderedFeatures(e.point, {
-  layers: dataLayers
-});
-
-if (hoveredFeatures.length > 0) {
-  renderInfoBox(hoveredFeatures[0]);
-} else {
-  ['score-3', 'score-ee', 'score-o2', 'score-vodafone'].forEach(id => {
-    const el = document.getElementById(id);
-    el.textContent = '—';
-    el.closest('.score-box').classList.remove('highlight');
-    const starId = 'stars-' + id.split('-')[1];
-    renderGreyStars(starId);
   });
-  document.getElementById('panel-district-code').textContent = '';
-  document.getElementById('district-note').style.visibility = 'hidden';
-}
-});
 
-// Open FAQ overlay by pressing button
-document.getElementById('faq-button').addEventListener('click', () => {
-const faqOverlay = document.getElementById('overlay-faq');
-faqOverlay.classList.toggle('open');
-});
+  document.addEventListener('keydown', (e) => {
+    if ((e.key === 'Escape' || e.key === 'Esc') && compareOverlay.classList.contains('open')) {
+      compareOverlay.classList.remove('open');
+    }
+  });
 
-// close FAQ overlay 
-document.getElementById('faq-close').addEventListener('click', () => {
-document.getElementById('overlay-faq').classList.remove('open');
-});
+  // Add Compare Locations panel & functionality =============================================
+  // Compare my locations button logic
+  const compareOverlay = document.getElementById('overlay-compare');
 
-// close FAQ overlay by pressing ESC
-document.addEventListener('keydown', (e) => {
-if (e.key === 'Escape' || e.key === 'Esc') {
-  const faqOverlay = document.getElementById('overlay-faq');
-  faqOverlay.classList.remove('open');
-}
-});
+  const tableButton = document.getElementById('table-button');
+  const compareClose = document.getElementById('compare-close');
 
-document.addEventListener('keydown', (e) => {
-  if ((e.key === 'Escape' || e.key === 'Esc') && compareOverlay.classList.contains('open')) {
+  document.getElementById('table-button').addEventListener('click', () => {
+    const faqOverlay = document.getElementById('overlay-faq');
+    const compareOverlay = document.getElementById('overlay-compare');
+
+    // Close FAQ if open
+    if (faqOverlay.classList.contains('open')) {
+      faqOverlay.classList.remove('open');
+    }
+
+    // Toggle Compare
+    compareOverlay.classList.toggle('open');
+  });
+
+  compareClose.addEventListener('click', () => {
     compareOverlay.classList.remove('open');
+  });
+
+  const compareTableBody = document.getElementById('compare-table-body');
+
+  function getStarRating(score) {
+    const fullStars = (() => {
+      if (score >= 0.86) return 5;
+      if (score >= 0.80) return 4;
+      if (score >= 0.70) return 3;
+      if (score >= 0.60) return 2;
+      if (score >= 0.01) return 1;
+      return 0;
+    })();
+
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+      const cls = i <= fullStars ? 'star gold' : 'star';
+      html += `<span class="${cls}">★</span>`;
+    }
+    return html;
   }
-});
-
-// Add Compare Locations panel & functionality =============================================
-// Compare my locations button logic
-const compareOverlay = document.getElementById('overlay-compare');
-
-const tableButton = document.getElementById('table-button');
-const compareClose = document.getElementById('compare-close');
-
-tableButton.addEventListener('click', () => {
-  compareOverlay.classList.toggle('open');
-});
-
-compareClose.addEventListener('click', () => {
-  compareOverlay.classList.remove('open');
-});
-
-const compareTableBody = document.getElementById('compare-table-body');
-
-function getStarRating(score) {
-const fullStars = (() => {
-  if (score >= 0.86) return 5;
-  if (score >= 0.80) return 4;
-  if (score >= 0.70) return 3;
-  if (score >= 0.60) return 2;
-  if (score >= 0.01) return 1;
-  return 0;
-})();
-
-let html = '';
-for (let i = 1; i <= 5; i++) {
-  const cls = i <= fullStars ? 'star gold' : 'star';
-  html += `<span class="${cls}">★</span>`;
-}
-return html;
-}
 
 
-function featureToRow(feature) {
-  const p = feature.properties;
-  return [
-    p.DISTRICT_CODE,
-    p.network_score_ee,
-    p.network_score_o2,
-    p.network_score_3,
-    p.network_score_vodafone,
-    ''
-  ];
-}
+  function featureToRow(feature) {
+    const p = feature.properties;
+    return [
+      p.DISTRICT_CODE,
+      p.network_score_ee,
+      p.network_score_o2,
+      p.network_score_3,
+      p.network_score_vodafone,
+      ''
+    ];
+  }
 
-// Tracks current table entries
-let compareRows = [];
+  // Tracks current table entries
+  let compareRows = [];
 
-function addDistrictToCompareTable(feature) {
-const district = feature.properties.DISTRICT_CODE;
-if (compareRows.some(row => row[0] === district)) return;
-if (compareRows.length >= 5) return;
+  function updateCompareTable() {
+    Array.from(compareTableBody.children).forEach((tr, index) => {
+      const data = compareRows[index];
+      Array.from(tr.children).forEach((td, colIndex) => {
+        td.innerHTML = '';
 
-const newRow = [
-  district,
-  feature.properties.network_score_ee,
-  feature.properties.network_score_o2,
-  feature.properties.network_score_3,
-  feature.properties.network_score_vodafone,
-  ''
-];
-compareRows.push(newRow);
-updateCompareTable();
-}
-
-function updateCompareTable() {
-Array.from(compareTableBody.children).forEach((tr, index) => {
-  const data = compareRows[index];
-  Array.from(tr.children).forEach((td, colIndex) => {
-    td.innerHTML = '';
-
-    if (data) {
-      if (colIndex === 5) {
-        const btn = document.createElement('button');
-        btn.innerHTML = '&times;';
-        btn.style.cssText = 'background:none; border:none; font-size:16px; cursor:pointer;';
-        btn.onclick = () => {
-          const removedDistrict = compareRows[index][0];
-          compareRows.splice(index, 1);
-          selectedDistricts = selectedDistricts.filter(d => d.code !== removedDistrict);
-          renderSelectedDistricts();
-          updateCompareTable();
-        };
-        td.appendChild(btn);
-      } else {
-        if (colIndex === 0 || colIndex === 5) {
-          td.innerHTML = data[colIndex];
-        } else {
-          const score = data[colIndex];
-          const percentage = typeof score === 'number' ? Math.floor(score * 100) + '%' : '—';
-          const stars = getStarRating(score);
-          td.innerHTML = `
-            <div class="compare-cell-content">
-              <span>${percentage}</span>
-              <span>${stars}</span>
-            </div>
-          `;
+        if (data) {
+          if (colIndex === 5) {
+            const btn = document.createElement('button');
+            btn.innerHTML = '&times;';
+            btn.style.cssText = 'background:none; border:none; font-size:16px; cursor:pointer;';
+            btn.onclick = () => {
+              const removedDistrict = compareRows[index][0];
+              compareRows.splice(index, 1);
+              selectedDistricts = selectedDistricts.filter(d => d.code !== removedDistrict);
+              renderSelectedDistricts();
+              updateCompareTable();
+            };
+            td.appendChild(btn);
+          } else {
+            if (colIndex === 0 || colIndex === 5) {
+              td.innerHTML = data[colIndex];
+            } else {
+              const score = data[colIndex];
+              const percentage = typeof score === 'number' ? Math.floor(score * 100) + '%' : '—';
+              const stars = getStarRating(score);
+              td.innerHTML = `
+                <div class="compare-cell-content">
+                  <span>${percentage}</span>
+                  <span>${stars}</span>
+                </div>
+              `;
+            }
+          }
         }
+      });
+    });
+    updateAverageStars();
+    updateDistrictFillLayer();
+    updateHighlightOutlineLayer();
+  }
+
+  // Clear all functionality
+  document.getElementById('clear-all-button').addEventListener('click', () => {
+    selectedDistricts = [];
+    renderSelectedDistricts();
+    compareRows = [];
+    updateCompareTable();
+  });
+
+  function updateDistrictFillLayer() {
+    console.log('Updating fill layer')
+    const isActive = document.getElementById('map-select').value === 'district_boundaries';
+    const districtCodes = multiSelectMode
+      ? selectedDistricts.map(d => d.code)
+      : compareRows.length ? [compareRows[0][0]] : [];
+
+    if (map.getLayer('district_fill')) {
+      map.setLayoutProperty('district_fill', 'visibility', isActive ? 'visible' : 'none');
+      if (isActive) {
+        console.log("mode:", multiSelectMode);
+        console.log("selectedDistricts:", selectedDistricts);
+        console.log("compareRows:", compareRows);
+        console.log("districtCodes:", districtCodes);
+        map.setFilter('district_fill', ['in', ['get', 'DISTRICT_CODE'], ['literal', districtCodes]]);
       }
     }
-  });
-});
-updateAverageStars();
-updateDistrictFillLayer();
-updateHighlightOutlineLayer();
-}
+  }
 
-// Clear all functionality
-document.getElementById('clear-all-button').addEventListener('click', () => {
-  selectedDistricts = [];
-  renderSelectedDistricts();
-  compareRows = [];
-  updateCompareTable();
-});
+  function updateHighlightOutlineLayer() {
+    const layerId = 'highlight-outline';
 
-function updateDistrictFillLayer() {
-  console.log('Updating fill layer')
-  const isActive = document.getElementById('map-select').value === 'district_boundaries';
-  const districtCodes = multiSelectMode
-    ? selectedDistricts.map(d => d.code)
-    : compareRows.length ? [compareRows[0][0]] : [];
+    const districtCodes = multiSelectMode
+      ? selectedDistricts.map(d => d.code)
+      : compareRows.length ? [compareRows[0][0]] : [];
 
-  if (map.getLayer('district_fill')) {
-    map.setLayoutProperty('district_fill', 'visibility', isActive ? 'visible' : 'none');
-    if (isActive) {
-      console.log("mode:", multiSelectMode);
-      console.log("selectedDistricts:", selectedDistricts);
-      console.log("compareRows:", compareRows);
-      console.log("districtCodes:", districtCodes);
-      map.setFilter('district_fill', ['in', ['get', 'DISTRICT_CODE'], ['literal', districtCodes]]);
+    if (map.getLayer(layerId)) {
+      if (districtCodes.length) {
+        map.setFilter(layerId, ['in', ['get', 'DISTRICT_CODE'], ['literal', districtCodes]]);
+        map.setLayoutProperty(layerId, 'visibility', 'visible');
+      } else {
+        map.setFilter(layerId, ['==', ['get', 'DISTRICT_CODE'], '___HIDDEN___']);
+        map.setLayoutProperty(layerId, 'visibility', 'none');
+      }
     }
   }
-}
-
-function updateHighlightOutlineLayer() {
-  const layerId = 'highlight-outline';
-
-  const districtCodes = multiSelectMode
-    ? selectedDistricts.map(d => d.code)
-    : compareRows.length ? [compareRows[0][0]] : [];
-
-  if (map.getLayer(layerId)) {
-    if (districtCodes.length) {
-      map.setFilter(layerId, ['in', ['get', 'DISTRICT_CODE'], ['literal', districtCodes]]);
-      map.setLayoutProperty(layerId, 'visibility', 'visible');
-    } else {
-      map.setFilter(layerId, ['==', ['get', 'DISTRICT_CODE'], '___HIDDEN___']);
-      map.setLayoutProperty(layerId, 'visibility', 'none');
-    }
-  }
-}
 
 
-function calculateStarValue(score) {
-  if (typeof score !== 'number' || isNaN(score)) return 0;
-  if (score >= 0.86) return 5;
-  if (score >= 0.80) return 4;
-  if (score >= 0.70) return 3;
-  if (score >= 0.60) return 2;
-  if (score >= 0.01) return 1;
-  return 0;
-}
+  function updateAverageStars() {
+    const operatorIndices = {
+      ee: 1,
+      o2: 2,
+      three: 3,
+      vodafone: 4
+    };
 
+    Object.entries(operatorIndices).forEach(([key, colIndex]) => {
+      const scores = compareRows.map(row => row[colIndex])
+        .filter(score => typeof score === 'number' && !isNaN(score));
 
-function updateAverageStars() {
-  const operatorIndices = {
-    ee: 1,
-    o2: 2,
-    three: 3,
-    vodafone: 4
-  };
+      if (!scores.length) {
+        document.getElementById(`avg-${key}`).innerHTML = '';
+        return;
+      }
 
-  Object.entries(operatorIndices).forEach(([key, colIndex]) => {
-    const scores = compareRows.map(row => row[colIndex])
-      .filter(score => typeof score === 'number' && !isNaN(score));
+      const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
+      const percent = Math.floor(avgScore * 100);
 
-    if (!scores.length) {
-      document.getElementById(`avg-${key}`).innerHTML = '';
-      return;
-    }
+      // Convert avg percentage score into star rating
+      let stars = 0;
+      if (avgScore >= 0.86) stars = 5;
+      else if (avgScore >= 0.80) stars = 4;
+      else if (avgScore >= 0.70) stars = 3;
+      else if (avgScore >= 0.60) stars = 2;
+      else if (avgScore >= 0.01) stars = 1;
 
-    const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
-    const percent = Math.floor(avgScore * 100);
-
-    // Convert avg percentage score into star rating
-    let stars = 0;
-    if (avgScore >= 0.86) stars = 5;
-    else if (avgScore >= 0.80) stars = 4;
-    else if (avgScore >= 0.70) stars = 3;
-    else if (avgScore >= 0.60) stars = 2;
-    else if (avgScore >= 0.01) stars = 1;
-
-    document.getElementById(`avg-${key}`).innerHTML = `${percent}%&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;${stars}★`;
-  });
-}
-
-
-function renderSelectedDistricts() {
-  selectedDistrictBox.innerHTML = '';
-  selectedDistricts.forEach(({ code }) => {
-    const badge = document.createElement('div');
-    badge.style.cssText = `
-      display: inline-block;
-      background: #eee;
-      border-radius: 4px;
-      padding: 4px 8px;
-      margin: 2px;
-      font-size: 12px;
-      position: relative;
-    `;
-    badge.innerHTML = `
-      ${code}
-      <span style="
-        position: absolute;
-        top: -6px;
-        right: -4px;
-        font-size: 14px;
-        cursor: pointer;
-        color: #999;
-        font-weight: bold;
-      " title="Remove">&times;</span>
-    `;
-    badge.querySelector('span').addEventListener('click', () => {
-      selectedDistricts = selectedDistricts.filter(d => d.code !== code);
-      renderSelectedDistricts();
-      compareRows = selectedDistricts.map(d => featureToRow(d.feature));
-      updateCompareTable();
+      document.getElementById(`avg-${key}`).innerHTML = `${percent}%&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;${stars}★`;
     });
-    selectedDistrictBox.appendChild(badge);
+  }
+
+
+  function renderSelectedDistricts() {
+    selectedDistrictBox.innerHTML = '';
+    selectedDistricts.forEach(({ code }) => {
+      const badge = document.createElement('div');
+      badge.style.cssText = `
+        display: inline-block;
+        background: #eee;
+        border-radius: 4px;
+        padding: 4px 8px;
+        margin: 2px;
+        font-size: 12px;
+        position: relative;
+      `;
+      badge.innerHTML = `
+        ${code}
+        <span style="
+          position: absolute;
+          top: -6px;
+          right: -4px;
+          font-size: 14px;
+          cursor: pointer;
+          color: #999;
+          font-weight: bold;
+        " title="Remove">&times;</span>
+      `;
+      badge.querySelector('span').addEventListener('click', () => {
+        selectedDistricts = selectedDistricts.filter(d => d.code !== code);
+        renderSelectedDistricts();
+        compareRows = selectedDistricts.map(d => featureToRow(d.feature));
+        updateCompareTable();
+      });
+      selectedDistrictBox.appendChild(badge);
+    });
+
+    // Show/hide clear icon depending on count
+    const clearBtn = document.getElementById('clear-selected-button');
+    if (selectedDistricts.length > 1) {
+      clearBtn.style.display = 'inline';
+    } else {
+      clearBtn.style.display = 'none';
+    }
+  }
+
+  document.getElementById('clear-selected-button').addEventListener('click', () => {
+    selectedDistricts = [];
+    renderSelectedDistricts();
+    compareRows = [];
+    updateCompareTable();
   });
-}
+
+  const toggleButton = document.getElementById('overlay-toggle-button');
+  const interactivityPanel = document.getElementById('overlay-interactivity');
+  const legendPanel = document.getElementById('overlay-legend');
+
+  toggleButton.addEventListener('click', () => {
+    const isCollapsed = interactivityPanel.classList.toggle('collapsed-left');
+    legendPanel.classList.toggle('collapsed-left');
+
+    toggleButton.classList.toggle('collapsed', isCollapsed);
+    toggleButton.textContent = isCollapsed ? '▶' : '◀';
+  });
+
 
 </script>
