@@ -1,2302 +1,748 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-5PXPD7V7');</script>
-<!-- End Google Tag Manager -->
-
-<!-- Load Mapbox GL JS -->
-<link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
-<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
-
-<!-- Geocoder Plugin CSS JS -->
-<link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.2.0/mapbox-gl-geocoder.css" rel="stylesheet" />
-<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.2.0/mapbox-gl-geocoder.min.js"></script>
-
-<!-- This tells the browser to interpret the HTML file as UTF-8 encoded, ensuring symbols and emoji render correctly across all environments. -->
 <meta charset="UTF-8">
-
-<!-- This tag is necessary to properly control media queries for mobile devices. It tells mobile browsers to render this page using the actual width of the device screen and not to zoom in or scale it automatically. Without this tag, the browser defaults to a virtual desktop width of around 980px, and tries to "fit" the content by zooming out – messing up with media queries intended for mobile. -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-</head>
-<body>
-
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5PXPD7V7"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
-
+<title>Consistent Quality — The Open Standard for Mobile Network Experience</title>
+<meta name="description" content="Consistent Quality is an open-source methodology for measuring real-world mobile network experience. Invented by Tom Luke in 2018 and adopted by Ofcom, mobile operators and consumer bodies globally.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Be Vietnam Pro', sans-serif !important;
-      color: #142223 !important;
-    }
+  :root {
+    --ink: #0f1923;
+    --ink-soft: #3a4a58;
+    --ink-muted: #6b7d8e;
+    --signal: #0057ff;
+    --signal-light: #e8f0ff;
+    --signal-pale: #f4f7ff;
+    --rule: #dde4ed;
+    --white: #ffffff;
+    --cream: #fafbfd;
+    --success: #00875a;
+  }
 
-    h3 { margin-top: 10px; margin-left: 0px; margin-bottom: 5px; margin-right: 10px; font-size: 16px; }
-    p {margin-left: 20px; margin-right: 20px;}
-    
-    #page-container {
-      padding: 0 0px;
-      box-sizing: border-box;
-      width: 100%;
-      overflow-x: hidden;
-      min-width: 260px;
-    }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    #contents-wrapper {
-      position: relative;
-      width: 100%;
-      max-width: 1440px;
-      min-width: 260px;
-      height: 90vh;
-      margin: 5vh auto 0;
-      box-sizing: border-box;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      overflow: hidden;
-      display: grid;
-      grid-template-rows: auto 1fr auto; /* top, map, footer */
-    }
+  html { scroll-behavior: smooth; }
 
-    #top-container {
-      position: relative;
-      width: 100%;
-      height: auto;
-      background: white;
-      z-index: 10;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      box-sizing: border-box;
-    }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    color: var(--ink);
+    background: var(--cream);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
 
-    #top-container > div:last-child {
-    border-bottom: none; /* Remove line under last section */
-    }
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(250,251,253,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--rule);
+    padding: 0 2rem;
+    height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-brand {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    color: var(--ink);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+  }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.85rem; font-weight: 400;
+    color: var(--ink-soft); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--signal); }
 
-    .page-title {
-      font-size: 32px;
-      font-weight: bold;
-      margin-top: 20px;
-      margin-bottom: 20px;
-      text-align: center;
-    }
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 120px 2rem 80px;
+    max-width: 900px; margin: 0 auto;
+    position: relative;
+  }
 
-    .page-subtitle {
-      font-size: 16px;
-      color: #555;
-      margin-bottom: 16px;
-      text-align: center;
-    }
-   
-    #geocoder {
-    width: 100%;
-    }
+  .hero-eyebrow {
+    font-size: 0.78rem; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--signal);
+    margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 0.75rem;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: inline-block; width: 32px; height: 2px;
+    background: var(--signal);
+  }
 
-    #geocoder .mapboxgl-ctrl-geocoder {
-    width: 100% !important;
-    font-size: 14px !important;
-    min-width: unset;
-    max-width: 300px;
-    margin: 0 auto;
-    box-sizing: border-box;
-    box-shadow: none !important;
-    border: 1px solid #ddd;
-    }
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.8rem, 6vw, 5rem);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 2rem;
+  }
+  h1 em {
+    font-style: italic;
+    color: var(--signal);
+  }
 
-    #geocoder-wrapper {
-      position: relative;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 0px;
-    }
+  .hero-lede {
+    font-size: clamp(1.1rem, 2vw, 1.3rem);
+    color: var(--ink-soft);
+    max-width: 620px;
+    margin-bottom: 3rem;
+    line-height: 1.6;
+  }
 
-    #geocoder-center-group {
-      display: flex;
-      justify-content: center;
-      width: 100%;
-    }
+  .hero-stats {
+    display: flex; gap: 3rem; flex-wrap: wrap;
+    border-top: 1px solid var(--rule);
+    padding-top: 2.5rem;
+  }
+  .stat-item {}
+  .stat-number {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.4rem;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 0.3rem;
+  }
+  .stat-label {
+    font-size: 0.82rem; font-weight: 400;
+    color: var(--ink-muted);
+    letter-spacing: 0.02em;
+  }
 
-    #geocoder-section {
-      
-      display: flex;
-      gap: 6px;
-      justify-content: center;
-      z-index: 1;
-    }
+  /* ── SECTIONS ── */
+  section {
+    padding: 80px 2rem;
+    max-width: 900px; margin: 0 auto;
+    border-top: 1px solid var(--rule);
+  }
 
-    #geocoder-right-wrapper {
-      display: flex;
-      flex-direction: row;
-      gap: 6px;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;        /* ✅ allow wrapping if too narrow */
-    }
+  .section-label {
+    font-size: 0.75rem; font-weight: 500;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--signal);
+    margin-bottom: 1rem;
+  }
 
-    #geocoder-right-inner {
-      display: flex;
-      gap: 4px;
-      flex-wrap: nowrap;
-      flex-shrink: 1;
-      max-width: 100%;
-    }
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 1.5rem;
+  }
 
-    #panel-district-code {
-      font-size: 16px;
-      font-weight: 600;
-      min-height: 28px;
-      padding: 4px 8px;
-      border-radius: 4px;
-      background-color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+  h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem;
+    color: var(--ink);
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.01em;
+  }
 
-    #selected-district-wrapper {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 6px;
-    }
+  p {
+    color: var(--ink-soft);
+    margin-bottom: 1.25rem;
+    max-width: 680px;
+  }
+  p:last-child { margin-bottom: 0; }
 
-    #selected-district-inner {
-      display: inline-flex;
-      align-items: center;
-      flex-wrap: nowrap;  /* ✅ prevent inner wrap */
-      gap: 6px;
-      flex-shrink: 1;
-      max-width: 100%;
-    }
+  /* ── PULL QUOTE ── */
+  .pull-quote {
+    border-left: 3px solid var(--signal);
+    padding: 1.5rem 2rem;
+    margin: 2.5rem 0;
+    background: var(--signal-pale);
+    border-radius: 0 8px 8px 0;
+  }
+  .pull-quote p {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.25rem;
+    font-style: italic;
+    color: var(--ink);
+    max-width: none;
+    line-height: 1.5;
+    margin: 0;
+  }
 
-    #selected-district-names {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 6px;
-      color: #676767
-    }
+  /* ── PROBLEM / SOLUTION SPLIT ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-top: 2rem;
+  }
+  @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; gap: 2rem; } }
 
-    #selected-district-names > div {
-      line-height: 1;
-      padding: 4px 6px;
-    }
+  .col-before {
+    padding: 1.5rem;
+    background: #fff3f3;
+    border: 1px solid #ffd5d5;
+    border-radius: 8px;
+  }
+  .col-after {
+    padding: 1.5rem;
+    background: #f0faf5;
+    border: 1px solid #b8e8d0;
+    border-radius: 8px;
+  }
+  .col-before h3 { color: #c0392b; }
+  .col-after h3 { color: var(--success); }
+  .col-before p, .col-after p { font-size: 0.92rem; color: var(--ink-soft); max-width: none; }
 
-    #info-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-    }
+  /* ── KPI TABLE ── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 2rem;
+  }
+  .kpi-cell {
+    background: var(--white);
+    padding: 1.25rem 1.5rem;
+  }
+  .kpi-name {
+    font-weight: 500; font-size: 0.9rem;
+    color: var(--ink);
+    margin-bottom: 0.25rem;
+  }
+  .kpi-desc {
+    font-size: 0.82rem;
+    color: var(--ink-muted);
+    line-height: 1.5;
+  }
 
-    .score-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
-      justify-items: center;
-      margin-left: 20px;
-      margin-right: 20px;
-    }
-
-    .score-box {
-      width: 120px;
-      flex: 0 1 120px;
-      background: #f7f6f6;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      text-align: center;
-      padding: 10px;
-      min-height: 70px;
-      box-sizing: border-box;
-    }
-
-    .operator-name {
-      font-weight: bold;
-      font-size: 16px;
-      margin-bottom: 6px;
-      color: #444;
-    }
-
-    .score-value {
-      font-size: 18px;
-      font-weight: bold;
-      color: #111;
-      line-height: 1.2em; /* Optional: adds more vertical stability */
-    }
-   
-    .score-value.highlight {
-      background-color: #d8f0d8;
-      border-radius: 4px;
-      padding: 4px 8px;
-      color: #006400;
-    }
-
-    .score-box.highlight {
-      border: 1px solid #ccc; /* Same as default */
-      background-color: #fffbe6; /* light yellow */
-      outline: 2px solid gold;
-      outline-offset: -1px;
-      box-shadow: 0 0 4px rgba(218,165,32,0.4); /* Optional glow */
-    }
-
-    #score-note {
-      display: none !important; /* can disable entirely */
-      font-size: 14px;
-      color: #676767;
-      margin-top: 8px;
-      text-align: center;
-    }
-
-    #district-note {
-      min-height: 20px; 
-      font-size: 14px; 
-      margin-top: 4px;
-      color: #676767; 
-      visibility: hidden; 
-      text-align: center;
-    }
-
-    #learn-more-link {
-      color: #0077cc;
-      cursor: pointer;
-    }
-
-    #map-section {
-      height: auto; /* let flexbox control height */
-      min-height: 0;
-      position: relative;
-    }
-
-    #map {
-      width: 100%;
-      height: 100%;
-      border-color: #020f17;
-    }
-
-    #mode-select {
-      width: 100%;
-      padding: 5.5px;
-      font-size: 16px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      text-align: center;
-    }
-
-    #map-select {
-      width: 100%;
-      padding: 5.5px;
-      font-size: 16px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      text-align: center;
-      margin-top: 6px
-    }
-
-    #overlay-interactivity {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 180px;
-      padding: 10px 20px 10px 20px;
-      z-index: 2;
-      background: rgba(255, 255, 255, 0.95);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-      transition: transform 0.3s ease;
-    }
-
-    /* When both panels are collapsed, move button to edge */
-    #overlay-interactivity.collapsed-left + #overlay-toggle-button {
-      left: 10px;
-    }
-
-    #overlay-interactivity.collapsed-left {
-      transform: translateX(-220px);
-    }
-
-    #overlay-legend {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 180px;
-      padding: 10px 20px 10px 20px;
-      background: rgba(255,255,255,0.95);
-      z-index: 1;
-      font-size: 16px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-      transition: transform 0.3s ease;
-      font-family: 'Be Vietnam Pro', sans-serif !important;
-    }
-
-    #overlay-legend.collapsed-left {
-      transform: translateX(-220px);
-    }
-
-    #legend { 
-      font-size: 16px;
-      font-family: 'Be Vietnam Pro', sans-serif !important;
-      box-shadow: 0 1px 2px rgba(0 0 0 0.1);
-      line-height: 20px;
-      height: max-content; /* Allows height to expand based on content */
-      width: max-content; /* Allows height to expand based on content */;
-      padding-bottom: 28px;
-    }
-    
-    #legend .legend-key {
+  /* ── THRESHOLD TABLE ── */
+  .threshold-table {
+    width: 100%; border-collapse: collapse;
+    margin-top: 2rem;
+    font-size: 0.88rem;
+  }
+  .threshold-table th {
+    background: var(--ink);
+    color: var(--white);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+  }
+  .threshold-table th:first-child { border-radius: 6px 0 0 0; }
+  .threshold-table th:last-child { border-radius: 0 6px 0 0; }
+  .threshold-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink-soft);
+    vertical-align: top;
+  }
+  .threshold-table tr:last-child td { border-bottom: none; }
+  .threshold-table tr:nth-child(even) td { background: var(--signal-pale); }
+  .threshold-table .metric { font-weight: 500; color: var(--ink); }
+  .badge {
     display: inline-block;
-    width: 15px;
-    height: 15px;
-    margin-right: 5px;
-    vertical-align: middle;
-    }
-
-    #map-footnote {
-      position: relative;
-      width: 100%;
-      background-color: white;
-      border-top: 1px solid #ccc;
-      padding: 6px 0px;
-      font-size: 14px;
-      color: #676767;
-      text-align: center;
-    }
-
-    #map-learn-more-link {
-      color: #0077cc;
-      cursor: pointer;
-    }
-
-    /* Toggle button */
-    #overlay-toggle-button {
-      position: absolute;
-      top: 10px;
-      left: 240px;
-      z-index: 12;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: white;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 20px;
-      transition: left 0.3s ease;
-    }
- 
-    #overlay-toggle-button.collapsed {
-      left: 20px !important;
-    }
-
-    #zoom-warning {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.95);
-      padding: 8px 16px;
-      border-radius: 6px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.2);
-      font-size: 14px;
-      font-weight: bold;
-      color: #333;
-      z-index: 999;
-      text-align: center;
-      display: none;
-    }
-
-    #overlay-faq {
-      position: absolute;
-      bottom: -420px;
-      left: 0;
-      width: 100%;
-      height: 420px;
-      background-color: white;
-      z-index: 300;
-      transition: bottom 0.4s ease;
-    }
-
-    #overlay-compare {
-      position: absolute;
-      bottom: -340px;
-      left: 0;
-      width: 100%;
-      height: 340px;
-      background-color: white;
-      z-index: 300;
-      transition: bottom 0.4s ease;
-    }
-
-    #overlay-faq.open,
-    #overlay-compare.open {
-      bottom: 0;
-    }
-
-    #overlay-faq {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .faq-header {
-      flex: 0 0 auto;
-      height: 46px;
-      background-color: white;
-      z-index: 1;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 20px;
-      box-sizing: border-box;
-    }
-
-    .faq-title {
-      font-size: 18px;
-      font-weight: bold;
-    }
-
-    #faq-close {
-      font-size: 22px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 4px 8px;
-      line-height: 1;
-    }
-    
-    .faq-content {
-      flex: 1 1 auto;
-      overflow-y: auto;
-      padding: 20px;
-      margin-bottom: 10px;
-      box-sizing: border-box;
-    }
-
-    .faq-item {
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      padding: 12px 16px;
-      margin-bottom: 12px;
-      background-color: #f7f6f6;
-      transition: all 0.3s ease;
-      width: 100%;
-      max-width: 500px;       /* limit width when collapsed */
-      box-sizing: border-box;
-      margin-left: 0;         /* align left */
-      margin-right: auto;     /* allow space to the right */
-    }
-
-    .faq-item.open {
-      max-width: none;        /* expand to container width */
-    }
-
-    .faq-question {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      font-weight: bold;
-      font-size: 16px;
-    }
-
-    .faq-toggle {
-      font-size: 18px;
-      font-weight: normal;
-      margin-left: 10px;
-    }
-
-    .faq-answer {
-      margin-top: 10px;
-      font-weight: normal;
-      display: none;
-      font-size: 16px;
-      color: #333;
-    }
-
-    .compare-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 20px;
-      margin-bottom: 12px;
-    }
-
-    .compare-title {
-      font-size: 18px;
-      font-weight: bold;
-    }
-
-    #compare-close {
-      font-size: 22px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      line-height: 1;
-    }
-    .compare-subtitle {
-      font-size: 16px;
-      color: #555;
-    }
-
-    #compare-table {
-      margin-top: 10px;
-      min-width: 240px;
-      border-collapse: collapse;
-      table-layout: fixed;
-      width: auto;
-      border-top: none;
-      border-bottom: none;
-    }
-
-    #compare-table th,
-    #compare-table td {
-      width: fit-content;
-      min-width: 0px;
-      height: 24px;
-      padding: 4px;
-      text-align: center;
-      vertical-align: middle;
-      border-top: 1px solid #ddd;
-      border-bottom: 1px solid #ddd;
-      border-left: none;
-      border-right: none;
-      word-wrap: break-word;
-    }
-
-    #compare-table tr:first-child th {
-      border-top: none; /* removes top line of first row */
-    }
-
-    #compare-table tr:last-child td {
-      border-bottom: none; /* removes bottom line of last row */
-    }
-
-    #compare-table th:nth-child(2),
-    #compare-table td:nth-child(2) {
-      background-color: #f7f6f6; 
-    }
-
-    #compare-table th {
-      color: black;
-      font-weight: bold;
-    }
-
-    #compare-table td {
-      color: black;
-    }
-
-    #compare-table td.top-score-cell {
-      color: #DAA520;
-      font-weight: bold;
-    }
-
-    #clear-all-button:hover {
-      color: red;
-    }
-
-    .heading-label {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: center;
-      width: 100%;
-      padding: 0;
-    }
-
-    .operator-name-label {
-      font-weight: bold;
-      padding: 0;
-      text-align: left;
-      justify-self: start;
-    }
-
-    .compare-cell-content { /* this controls formatting for the individual districts' operator cells in the table */
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 4px;
-    }
-
-    .compare-inner {
-      padding: 0 20px;
-      height: 100%;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .compare-table-scroll {
-      overflow-x: auto;
-      width: 100%;
-    }
-
-    #table-button {
-      display: none;
-    }
-
-    .district-header-wrapper {
-      position: relative;
-      display: inline-block;
-      padding-right: 14px;
-    }
-
-    .remove-district {
-      position: absolute;
-      top: -6px;
-      right: -6px;
-      background: none;
-      border: none;
-      font-size: 14px;
-      color: #888;
-      cursor: pointer;
-      padding: 0;
-    }
-
-    .remove-district:hover {
-      color: red;
-    }
-
-    #table-note sup {
-      font-size: 14px;
-      vertical-align: super;
-    }
-
-    .mapboxgl-ctrl-logo {
-      position: absolute !important;
-      left: 10px !important;
-      bottom: 2px !important;
-      z-index: 10;
-    }
-
-    @media (max-width: 360px) {
-
-      #top-container {
-        padding-left: 12px !important;
-        padding-right: 12px !important;
-        row-gap: 6px !important;
-      }
-
-      .page-title {
-        margin-top: 6px;
-        font-size: 20px !important;
-      }
-
-      .page-subtitle {
-        font-size: 14px !important;
-      }      
-
-      .mapboxgl-ctrl-geocoder input[type="text"] {
-        font-size: 14px !important;
-      }
-
-      #panel-district-code {
-        font-size: 14px !important;
-      }
-      
-      #mode-select {
-        font-size: 14px;
-        padding: 4px;
-      }
-
-      #faq-button {
-        font-size: 14px !important;
-        padding: 4px !important;
-      }
-
-      #map-select {
-        font-size: 14px;
-        padding: 4px;
-      }
-
-      #table-button {
-        font-size: 14px !important;
-        padding: 4px !important;
-      }
-
-      #overlay-interactivity {
-        width: 140px;
-        padding: 6px 12px 6px 12px;
-      }
-
-      #overlay-toggle-button {
-        top: 4px;
-        left: 176px;
-      }
-
-      #overlay-legend {
-        width: 140px;
-        padding: 6px 12px 6px 12px;
-      }
-
-      #legend {
-        font-size: 14px;
-        line-height: 18px;
-        padding-bottom: 0px;
-      }
-
-      /* When both panels are collapsed, move button to edge */
-      #overlay-toggle-button.collapsed {
-        left: 12px !important;
-      }
-            
-      .score-value {
-        font-size: 16px !important;
-      }
-
-      .operator-name {
-        font-size: 14px !important;
-      }
-
-      #district-note {
-        min-height: 30px !important;
-        font-size: 12px;
-      }
-      
-      #map-footnote {
-        font-size: 12px;
-      }  
-
-      .mapboxgl-ctrl-logo {
-        display: none !important;
-      }
-
-      .faq-header {
-        padding: 0 12px;
-      }
-
-      .faq-content {
-        padding: 12px;
-      }
-
-      .faq-item {
-        padding: 12px;
-      }
-
-      .faq-title {
-        font-size: 16px;
-      }
-
-      .faq-question {
-        font-size: 14px;
-      }
-
-      .faq-answer {
-        font-size: 14px;
-      }
-
-      p {
-        margin-left: 0px; 
-        margin-right: 0px;
-      }
-
-      .compare-title {
-        font-size: 16px;
-      }
-
-      .compare-subtitle {
-        font-size: 14px;
-        color: #909090;
-      }
-
-      #table-note {
-        font-size: 12px;
-        color: #909090 !important;
-      }
-
-      #compare-table {
-        min-width: 160px;
-      }
-
-      #compare-table th {
-        font-size: 14px;
-        width: fit-content;
-        min-width: 0px;
-      }
-
-      #compare-table td {
-        font-size: 14px;
-        width: fit-content;
-        min-width: 0px;
-      }
- 
-    }        
-
-    /* Override on smaller screens - mobile size*/
-    @media (max-width: 600px) {
-      #page-container {
-        padding: 0px;
-      }
-
-      #contents-wrapper {
-        padding: 0 0px;
-        height: 100vh;
-        margin: 0vh auto 0;
-      }
-
-      #top-container {
-        padding-left: 20px;
-        padding-right: 20px;
-        row-gap: 10px;
-      }
-
-      .page-title {
-        font-size: 24px;
-        text-align: left;
-        margin-bottom: 0px;
-      }
-
-      .page-subtitle {
-        text-align: left;
-        margin-bottom: 0px;
-        color: #909090;
-      }      
-
-      .mapboxgl-ctrl-geocoder input[type="text"] {
-        font-size: 16px ;
-        height: 53px !important;
-        padding: 6px 8px 6px 36px !important; /* leave space for the icon */
-      }
-
-      .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--icon {
-        width: 20px !important;
-        height: 20px !important;
-        left: 8px !important;
-        top: 50% !important;
-        transform: translateY(-50%) !important;
-      }
-
-      .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--icon-search {
-        background-size: 18px 18px !important;
-      }
-
-      #geocoder-wrapper {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: flex-start;
-      }
-
-      #geocoder-center-group {
-        width: 49%;
-        justify-content: flex-start;
-      }
-
-      #geocoder-right-wrapper {
-        width: 50%;
-        justify-content: flex-start;
-      }
-      
-      #panel-district-code {
-        min-height: 50px;
-        padding: 0px;
-      }
-      
-      #selected-district-names {
-          gap: 3px;
-      }
-      
-      .score-grid {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: space-between;
-          gap: 0; /* managed by margins */
-          width: 100%;
-      }
-      
-      .score-box {
-        width: 23%;
-        flex: 0 1 23%;
-        border-radius: 4px;
-        min-height: 50px;
-        padding: 5px 0px;
-      }      
-
-      #score-note {
-        display: none !important; /* can disable entirely */
-        width: 100%;
-        text-align: left;
-      }
-
-      #district-note {
-        min-height: 34px;
-        width: 100%; 
-        text-align: left;
-        margin-top: 2px;
-        line-height: 1.2;
-        color: #909090;
-      }
-
-      #overlay-toggle-button {
-        width: 32px;
-        height: 32px;
-        font-size: 16px;
-      }
-      
-      #map-footnote {
-        padding: 3px 20px;
-        width: fit-content;
-        text-align: left;
-        line-height: 1.2;
-        color: #909090;
-      }
-      
-      #overlay-faq {
-        bottom: -100%;
-        height: 100%;
-      }      
-
-      #overlay-compare {
-        bottom: -370px;
-        height: 370px;
-      }      
-
-      .compare-header {
-        margin-top: 10px;
-      }         
-
-      .mapboxgl-ctrl-group {
-        display: none !important; /* can disable entirely */
-      }
-
-      .compare-subtitle {
-        color: #909090;
-      }
-
-      #table-note {
-        color: #909090 !important;
-      }
-
-      #compare-table {
-        min-width: 160px;
-      }
-
-      #compare-table th {
-        width: fit-content;
-        min-width: 0px;
-      }
-
-      #compare-table td {
-        width: fit-content;
-        min-width: 0px;
-      }
-    }
-
-    /* Override on wider screens: float to the right */
-    @media (min-width: 768px) {
-
-      #geocoder-section {
-        position: relative;
-      }
-
-      #geocoder-right-wrapper {
-        position: absolute;
-        top: 0;
-        left: calc(50% + 160px);
-        display: flex;
-        flex-direction: row;     
-        align-items: center;     
-        gap: 12px;               
-        margin-top: 0px;
-        margin-bottom: 0px;
-      }
-
-      #geocoder-wrapper {
-        margin-bottom: 20px !important;
-      }
-    }    
-
+    font-size: 0.72rem; font-weight: 500;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+  }
+  .badge-core { background: #e8f5e9; color: #2e7d32; }
+  .badge-excellent { background: var(--signal-light); color: var(--signal); }
+
+  /* ── TIMELINE ── */
+  .timeline {
+    margin-top: 2rem;
+    position: relative;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute; left: 7px; top: 8px; bottom: 8px;
+    width: 2px; background: var(--rule);
+  }
+  .timeline-item {
+    padding-left: 2.5rem;
+    position: relative;
+    margin-bottom: 2rem;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute; left: 0; top: 8px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--white);
+    border: 2px solid var(--signal);
+  }
+  .timeline-year {
+    font-size: 0.75rem; font-weight: 500;
+    color: var(--signal);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+  }
+  .timeline-item h3 { font-size: 1rem; margin-bottom: 0.4rem; }
+  .timeline-item p { font-size: 0.88rem; color: var(--ink-muted); max-width: none; margin: 0; }
+
+  /* ── ADOPTION GRID ── */
+  .adoption-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  .adoption-card {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 1.25rem;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .adoption-card:hover { border-color: var(--signal); transform: translateY(-2px); }
+  .adoption-region {
+    font-size: 0.72rem; font-weight: 500;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 0.5rem;
+  }
+  .adoption-operators {
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+
+  /* ── OFCOM HIGHLIGHT ── */
+  .ofcom-block {
+    background: var(--ink);
+    color: var(--white);
+    border-radius: 12px;
+    padding: 2.5rem;
+    margin-top: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .ofcom-block::before {
+    content: '';
+    position: absolute; top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(0,87,255,0.15);
+  }
+  .ofcom-block h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    color: var(--white);
+    margin-bottom: 0.75rem;
+  }
+  .ofcom-block p { color: rgba(255,255,255,0.7); max-width: none; }
+  .ofcom-block a { color: #7eb3ff; }
+
+  /* ── OPEN SOURCE BOX ── */
+  .open-source-box {
+    background: var(--signal-pale);
+    border: 1px solid var(--signal-light);
+    border-radius: 8px;
+    padding: 2rem;
+    margin-top: 2rem;
+  }
+  .open-source-box h3 { color: var(--signal); }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--rule);
+    padding: 3rem 2rem;
+    max-width: 900px; margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+  .footer-brand {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+  .footer-credit {
+    font-size: 0.82rem;
+    color: var(--ink-muted);
+    line-height: 1.6;
+  }
+  .footer-credit a { color: var(--signal); text-decoration: none; }
+  .footer-links { display: flex; flex-direction: column; gap: 0.5rem; }
+  .footer-links a {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--signal); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero-eyebrow { animation: fadeUp 0.6s ease both; }
+  h1 { animation: fadeUp 0.6s 0.1s ease both; }
+  .hero-lede { animation: fadeUp 0.6s 0.2s ease both; }
+  .hero-stats { animation: fadeUp 0.6s 0.3s ease both; }
 </style>
 </head>
 <body>
 
-<div id="page-container">
-  <div id="contents-wrapper">
-    <div id="top-container">
-      <div class="page-title">Mobile Network Quality Checker</div>
-      <div class="page-subtitle">Compare the percentage of time users have a good experience across providers.</div>
-        
-      <div id="geocoder-wrapper">
-        <div id="geocoder-center-group">
-          <div id="geocoder-section">
-            <div id="geocoder"></div>
-          </div>
-        </div>
-  
-        <div id="geocoder-right-wrapper">
-          <div id="geocoder-right-inner">
-            <div id="panel-district-code"></div>
-            <div id="selected-district-wrapper">
-              <div id="selected-district-inner">
-                <div id="selected-district-names"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-          
-      <div id="info-section">
-        <div id="pd" class="score-grid">
-          <div class="score-box">
-            <div class="operator-name">EE</div>
-            <div id="score-ee" class="score-value">—</div>
-          </div>
-          <div class="score-box">
-            <div class="operator-name">O2</div>
-            <div id="score-o2" class="score-value">—</div>
-          </div>
-          <div class="score-box">
-            <div class="operator-name">Three</div>
-            <div id="score-three" class="score-value">—</div>
-          </div>          
-          <div class="score-box">
-            <div class="operator-name">Vodafone</div>
-            <div id="score-vodafone" class="score-value">—</div>
-          </div>
-        </div>
-        <div id="score-note">
-          Percentage of time users have a good experience. 
-          <span id="learn-more-link">Learn more ></span>
-        </div>
-        <div id="district-note">
-          These results are at postcode area level
-        </div>                      
-      </div>
+<nav>
+  <a href="#" class="nav-brand">Consistent Quality</a>
+  <ul class="nav-links">
+    <li><a href="#what">What it measures</a></li>
+    <li><a href="#methodology">Methodology</a></li>
+    <li><a href="#adoption">Adoption</a></li>
+    <li><a href="#open">Open standard</a></li>
+    <li><a href="#origin">Origin</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">The open standard for mobile network experience</div>
+  <h1>How often does your<br>mobile network <em>just work?</em></h1>
+  <p class="hero-lede">
+    Consistent Quality is an open-source methodology that measures what mobile users actually care about: not peak speeds, but how reliably a network delivers a good experience for everyday tasks — video calls, streaming, browsing, gaming — the vast majority of the time.
+  </p>
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-number">2018</div>
+      <div class="stat-label">Year introduced</div>
     </div>
-  
-    <div id="map-section">
-      <div id="map"></div>
-  
-      <div id="overlay-interactivity">
-        <div id="mode-dropdown-section">
-          <select id="mode-select">
-            <option value="basic">Basic mode</option>
-            <option value="advanced">Advanced mode</option>
-          </select>
-        </div>
-        <div id="layer-switcher-section">
-          <select id="map-select">
-            <option value="best_provider">Best provider</option>
-            <option value="district_boundaries">Selected locations</option>
-            <option value="score_ee">EE</option>
-            <option value="score_o2">O2</option>
-            <option value="score_three">Three</option>
-            <option value="score_vodafone">Vodafone</option>
-          </select>
-        </div> 
-        <button id="table-button" style="width: 100%; padding: 6px; font-size: 16px; margin-top: 6px; border: 1px solid #ddd; border-radius: 4px; background-color: white; cursor: pointer;">
-          View comparison
-        </button>
-        <button id="faq-button" style="width: 100%; padding: 6px; font-size: 16px; margin-top: 6px; border: 1px solid #ddd; border-radius: 4px; background-color: white; cursor: pointer;">
-          About this checker
-        </button> 
-      </div>
-    
-      <button id="overlay-toggle-button" title="Toggle side panels">◀</button>
-
-      <div id="zoom-warning">Zoom in to see network quality results</div>
-
-      <div id="overlay-legend">
-        <div id="legend"></div>
-      </div>
+    <div class="stat-item">
+      <div class="stat-number">40+</div>
+      <div class="stat-label">Countries where operators use it</div>
     </div>
-
-    <div id="map-footnote">
-      The map shows average experience but does not mean the operator has coverage across the whole area. Your experience may vary. 
-      <span id="map-learn-more-link">Learn more ></span>
-    </div>    
-    
-    <div id="overlay-faq">
-      <div class="faq-header">
-        <span class="faq-title">Frequently Asked Questions</span>
-        <button id="faq-close">&times;</button>
-      </div>
-      <div class="faq-content">
-        <div class="faq-item">
-          <div class="faq-question">
-            <span class="faq-text">What does this map show?</span>
-            <span class="faq-toggle">+</span>
-          </div>
-          <div class="faq-answer">The map visualizes mobile network quality across UK postal districts, allowing users to check the network quality in their local area and compare mobile service providers. It is based on data from Opensignal apps that collect network quality information.</div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">
-            <span class="faq-text">What do the percentage scores mean?</span>
-            <span class="faq-toggle">+</span>
-          </div>
-          <div class="faq-answer">
-            <p>The percentage scores represent “how often is the network good enough” to support everyday tasks like browsing the internet, streaming videos, or making video calls, all without major slowdowns or disruptions.</p>
-            <p>To calculate these scores, several aspects of network performance are considered, including download throughput (min. 5Mbps), upload throughput (min. 1.5Mbps), and latency (max. 50ms). The thresholds used are based on the performance requirements of common mobile applications, particularly those that place higher demands on the network. The percentage score reflects how often test results meet these standards on 4G and 5G networks.</p>
-            <p>In other words, a higher score means that users are more likely to enjoy a smooth mobile experience when performing everyday tasks requiring internet connectivity. Cases where the network has weak or no signal or where the performance is low will reduce the percentage score.</p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">
-            <span class="faq-text">Where is the data coming from, and how recent is it?</span>
-            <span class="faq-toggle">+</span>
-          </div>
-          <div class="faq-answer">
-            <p>The data shown on this map is collected from over 1 million mobile handsets in the UK running apps by Opensignal, an independent network analytics company. Opensignal specializes in measuring real-world mobile network experience, and their data is used by regulators, media, and the telecom industry worldwide.</p>
-            <p>The scores are based on data collected over a 12-month period, from May 1, 2024 to April 30, 2025. This long-term view helps ensure that the results are stable, reliable, and representative of typical network performance across different times, seasons, and conditions.</p>
-          </div>
-        </div>       
-        
-        <div class="faq-item">
-          <div class="faq-question">
-            <span class="faq-text">How is the data collected?</span>
-            <span class="faq-toggle">+</span>
-          </div>
-          <div class="faq-answer">
-            <p>The data used in this map comes from millions of measurements gathered from a diverse set of iOS and Android smartphone users covering a wide range of demographics,  device types and locations. The majority of measurements are generated through regularly scheduled periodic tests, executed independently on the background and at random intervals to capture the network experience at different moments in time.</p>
-            <p>Opensignal places a strong emphasis on privacy and transparency. All data is collected anonymously, with participants’ consent. No personally identifiable information is collected, and the data is strictly used in a depersonalized way to support research and reporting. Data is collected and processed in accordance with GDPR and other applicable regulations.</p>
-          </div>
-        </div>   
-        
-        <div class="faq-item">
-          <div class="faq-question">
-            <span class="faq-text">How accurate is the data?</span>
-            <span class="faq-toggle">+</span>
-          </div>
-          <div class="faq-answer">
-            <p>The data accurately reflects the average network quality of experience received by a range of mobile devices in each location over the last 12 months. The data shown on the map comes from real-world usage, collected anonymously from app users connected to 4G and 5G networks. This crowdsourced data is then used to calculate the average mobile network quality in each postal district.</p>
-            <p>To ensure reliability, district-level scores are displayed only when sufficient data is available to support confident results. If data for any of the four networks in a district is insufficient to determine confident results, scores for the broader postal area are shown instead for all network operators. In such cases, a note will appear below the score boxes to indicate the change in geographical granularity.</p>
-            <p>Although every effort is made to ensure the accuracy of the data, mobile network performance may still vary based on the user's specific location, device, and time of day. The map provides a strong general overview, but individual experiences can differ.</p>
-          </div>
-        </div>        
-
-        <div class="faq-item">
-          <div class="faq-question">
-            <span class="faq-text">Why is my mobile network provider not in the list?</span>
-            <span class="faq-toggle">+</span>
-          </div>
-          <div class="faq-answer">
-            <p>The map shows the network quality of the four main mobile network operators in the UK: EE, Vodafone, O2 and Three. All other mobile operators in the UK provide their services over these networks.</p>
-            <ul>
-              <li>Lebara Mobile, Asda Mobile, Talk Mobile and VOXI use the Vodafone network.</li>
-              <li>Your Co-op, 1p Mobile, Utility Warehouse, Ecotalk, Plusnet, BT Mobile and Lycamobile use the EE network.</li>
-              <li>iD Mobile, Smarty, Freedompop and Superdrug Mobile use the Three network.</li>
-              <li>Tesco Mobile, Giffgaff and Sky Mobile use the O2 network.</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">
-            <span class="faq-text">Do these maps represent mobile networks’ coverage?</span>
-            <span class="faq-toggle">+</span>
-          </div>
-          <div class="faq-answer">
-            <p>No, these maps do not represent mobile network coverage. Instead, they represent the average quality of network performance that users experience when connected to 4G and 5G networks across UK postal districts.</p>
-            <p>Coverage maps typically show where an estimated signal is available, but that doesn’t always reflect the real-world experience or where apps will “just work”. These maps show what is the likelihood that users will have a “good enough” experience to perform everyday tasks (i.e., “how often will it just work?”) – based on data from actual users using their phones in those districts. This includes factors like how fast the network is and how reliable the connection feels during everyday use.</p>
-            <p>So while a coverage map might tell users that a signal likely exists, this map helps users understand how usable and consistent that signal is in real life.</p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">
-            <span class="faq-text">How do I interact with the map?</span>
-            <span class="faq-toggle">+</span>
-          </div>
-          <div class="faq-answer">
-            <p>You can explore the map by zooming, panning, and selecting different postal districts to see how mobile networks perform in your area.</p>
-            <p>To begin, you can search for a postcode using the search bar at the top. Once you find your area, you can click on any district to view its mobile network scores. This will update the score boxes with detailed ratings for each mobile operator.</p>
-            <p>If you want to compare more than one area, use the “Advanced mode” button to turn on multi-selection mode. In this mode, each district you select (up to 5) will be highlighted and included in the comparison, with the score boxes showing their average scores. When in this mode you can also access the selected districts’ scores breakdown by clicking on “Result table” to access the individual scores.</p>
-            <p>You can toggle the “Show selected locations” layer to highlight the areas you’ve chosen, or select any of the four operators’ layers to visualize their individual networks’ quality across the UK.</p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">
-            <span class="faq-text">What areas are covered by the map?</span>
-            <span class="faq-toggle">+</span>
-          </div>
-          <div class="faq-answer">
-            <p>The map covers the entire United Kingdom, with data displayed at the postal district level – these are the first part of UK postcodes, such as "SW1" or "B23".</p>
-            <p>To make the map load quickly and work smoothly, the visual layers have been slightly simplified. This means that in some areas, especially around coastlines and islands, the map shapes might not look like they fully cover the land. However, the data itself includes the full UK landmass, and all network test results have been used to calculate the scores, even if some edges look trimmed on the map.</p>
-            <p>Opensignal used a recent and comprehensive postal district boundary dataset. However, a few very new or extremely small postal districts may not appear yet due to boundary update timing or limitations in the mapping data.</p>
-            <p>In short, the coverage is nationwide, and all valid readings have been included in the results – even if the visual borders appear slightly simplified in some places.</p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">
-            <span class="faq-text">Why does my area have a high score when I get a poor signal?</span>
-            <span class="faq-toggle">+</span>
-          </div>
-          <div class="faq-answer">
-            <p>The map shows the average network quality based on real-world data collected from mobile app users. It reflects how well mobile networks perform when users are connected to 4G or 5G, focusing on factors like speed and latency – not overall coverage.</p>
-            <p>The data is collected from a wide range of locations and devices, with thresholds to ensure the results are statistically robust. However, it may not reflect every individual experience across a district.</p>
-            <p>Many factors can affect individual experience, such as indoor coverage, device type, or network congestion. Therefore, individual experience may vary even in areas with high average scores.</p>
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">
-            <span class="faq-text">How often will the tool be updated?</span>
-            <span class="faq-toggle">+</span>
-          </div>
-          <div class="faq-answer">This tool is intended to be updated regularly throughout the year to incorporate the latest available data and improvements in mobile network performance. The aim is to keep the map as useful and current as possible, though the timing of updates may vary.</div>
-        </div>        
-
-      </div>
+    <div class="stat-item">
+      <div class="stat-number">100%</div>
+      <div class="stat-label">Open source &amp; free to use</div>
     </div>
-  
-    <div id="overlay-compare">
-      <div class="compare-inner">
-        <div class="compare-header">
-          <span class="compare-title">Comparison table</span>
-          <button id="compare-close" style="font-size: 22px; background: none; border: none; cursor: pointer;">×</button>
-        </div>
-        <div class="compare-subtitle-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-          <div class="compare-subtitle">Select multiple districts to compare network scores and find the best network provider</div>
-          <button id="clear-all-button" title="Clear all" style="background: none; border: none; cursor: pointer; font-size: 12px; color: #555;">
-            🗑️ Clear Table
-          </button>
-        </div>
-        <div class="compare-table-scroll">
-          <table id="compare-table">
-            <thead><tr></tr></thead>
-            <tbody id="compare-table-body"></tbody>
-          </table>        
-        </div>
-        <div id="table-note" style="color: #676767; margin-top: 4px; text-align: left;">
-          <sup>¹</sup> These results are at postcode area level. <sup>²</sup> Our users have reported patchy signal on this operator in this location.
-        </div>
-      </div>
-    </div>  
+    <div class="stat-item">
+      <div class="stat-number">2025</div>
+      <div class="stat-label">Adopted by Ofcom, UK</div>
+    </div>
   </div>
 </div>
-  
 
-<script> // FULL SCRIPT ==============================================================================================================================
-    
-  // Initialie map  
-  const ACCESS_TOKEN = 'pk.eyJ1IjoiYnJ5dGx5dCIsImEiOiJjbWVsaW15NXQwYTBzMmxzY3o3d3g3YWFpIn0.ae7fmcclOE-q4oxdP66QtQ' // access token
-  mapboxgl.accessToken = ACCESS_TOKEN;
-  const map = new mapboxgl.Map({
-     container: 'map', // container id
-     style: 'mapbox://styles/brytlyt/cmek0fic5001f01qtd7nbgnq7', // replace this with your style URL
-     zoom: 7, // opens the map at a predefined zoom level
-     minZoom: 5, // hardcoded min zoom
-     maxZoom: 14,  // hardcoded max zoom
-     center: [-1.22, 51.94], // center point of map at opening
-     attributionControl: false, // turn off default (to append custom to default one)
-     maxBounds: [
-        [-11, 49.5], // Southwest corner [lng, lat]
-        [2.5, 61]    // Northeast corner [lng, lat]
-      ] // Restrict map movement
-     });
-
-  let multiSelectMode = false;
-  let selectedDistricts = []; // Stores { code, feature }
-  let currentHighlightedArea = null; // Reuse this from your click/geocoder logic
-  let currentHighlightLayer = null;  // Store which layer the highlight is in
-
-  const clickableLayers = ['best_provider','score_vodafone','score_ee','score_o2','score_three','score_geo','district_boundaries'];
-
-
-  // Display zoom pop-up when zoom lower than 7 (or whatever is the min zoom of the Mapbox style) ======================================================
-  map.on('zoom', () => {
-    const zoomWarning = document.getElementById('zoom-warning');
-    if (map.getZoom() < 7) {
-      zoomWarning.style.display = 'block';
-    } else {
-      zoomWarning.style.display = 'none';
-    }
-  });
-
-  // Add Navigation controls top right and custom attribution bottom right ===========================================================================
-  map.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-  // Add your combined attribution manually
-  map.addControl(new mapboxgl.AttributionControl({
-    customAttribution: '© Opensignal, Postal boundaries © XYZ Ltd',
-    //compact: true
-  }));
-
-  // Set functionality mode ==========================================================================================================================
-  const selectedDistrictBox = document.getElementById('selected-district-names');
-  document.getElementById('mode-select').addEventListener('change', updateFunctionalityModeUI);
-
-  function updateFunctionalityModeUI() {
-    const mode = document.getElementById('mode-select').value;
-    multiSelectMode = (mode === 'advanced');
-
-    // Show or hide table button and layer switcher based on mode
-    document.getElementById('table-button').style.display = multiSelectMode ? 'block' : 'none';
-    document.getElementById('layer-switcher-section').style.display = multiSelectMode ? 'block' : 'none';
-
-    // If switching to Basic, trim selection
-    if (!multiSelectMode) {
-      if (selectedDistricts.length > 1) {
-        selectedDistricts = [selectedDistricts[0]];
-        compareRows = [featureToRow(selectedDistricts[0].feature)];
-        renderSelectedDistricts();
-        updateCompareTable();
-        updateDistrictFillLayer();
-        updateHighlightOutlineLayer();
-      }
-
-      // Hide table overlay
-      document.getElementById('overlay-compare').classList.remove('open');
-
-      // ✅ Force switch to best_provider layer
-      document.getElementById('map-select').value = 'best_provider';
-      document.getElementById('map-select').dispatchEvent(new Event('change'));
-    }
-
-  }
-
-  // Call updateFunctionalityModeUI() once at load to ensure correct defaults:
-  document.addEventListener('DOMContentLoaded', () => {
-    updateFunctionalityModeUI();
-    updateCompareTable(); // ✅ Force initial table render
-  });
-
-
-  // this script populates the legend box ======================================================
-  map.on('load', () => {
-
-    // Force the first layer to be visible
-    map.setLayoutProperty('best_provider', 'visibility', 'visible');
-
-    // Hide the others
-    ['score_vodafone', 'score_ee', 'score_o2', 'score_three', 'score_geo', 'district_boundaries'].forEach(layer => {
-    map.setLayoutProperty(layer, 'visibility', 'none');
-    });
-
-    // Get reference to the legend container
-    const legend = document.getElementById('legend');
-
-    // Define legend content for different layers
-    const legends = {
-        'best-provider': {
-            title: 'Best provider:',
-            layers: ['EE', 'O2', 'Three', 'Vodafone', 'Tie'],
-            colors: ['#206873bf', '#081f4abe', '#67217dbf', '#d00100be', '#878787be']
-        },
-        'score_vodafone': {
-            title: 'Network score:',
-            layers: ['90% - 100%', '80% - 89%', '70% - 79%', '60% - 69%', '50% - 59%', '0% - 49%'],
-            colors: ['#38761d', '#6aa84f', '#b6d7a8', '#f9ce01', '#ff9903','#f47901']
-        },
-        'score_ee': {
-            title: 'Network score:',
-            layers: ['90% - 100%', '80% - 89%', '70% - 79%', '60% - 69%', '50% - 59%', '0% - 49%'],
-            colors: ['#38761d', '#6aa84f', '#b6d7a8', '#f9ce01', '#ff9903','#f47901']
-        },
-        'score_o2': {
-          title: 'Network score:',
-            layers: ['90% - 100%', '80% - 89%', '70% - 79%', '60% - 69%', '50% - 59%', '0% - 49%'],
-            colors: ['#38761d', '#6aa84f', '#b6d7a8', '#f9ce01', '#ff9903','#f47901']
-        },
-        'score_three': {
-            title: 'Network score:',
-            layers: ['90% - 100%', '80% - 89%', '70% - 79%', '60% - 69%', '50% - 59%', '0% - 49%'],
-            colors: ['#38761d', '#6aa84f', '#b6d7a8', '#f9ce01', '#ff9903','#f47901']
-        },
-        'score_geo': {
-            title: 'Score reportability:',
-            layers: ['Postal District', 'Postal Area'],
-            colors: ['#50b4ad', '#edc626']
-        },
-        'district_boundaries': {
-            title: 'District:',
-            layers: ['Selected', 'Not selected'],
-            colors: ['#eec463', '#ffffff']
-        }
-    };
-
-    // Add your dropdown change event here
-    document.getElementById('map-select').addEventListener('change', function () {
-      const selectedLayer = this.value;
-
-      // Show selected layer
-      const allLayers = ['best_provider', 'score_vodafone', 'score_ee', 'score_o2', 'score_three', 'score_geo', 'district_boundaries'];
-      allLayers.forEach(layer => {
-        map.setLayoutProperty(layer, 'visibility', layer === selectedLayer ? 'visible' : 'none');
-      });
-
-      // Always update fill visibility based on state
-      updateDistrictFillLayer();
-      updateHighlightOutlineLayer();
-
-      // Update legend
-      const legendKeyMap = {
-        'best_provider': 'best-provider',
-        'score_vodafone': 'score_vodafone',
-        'score_ee': 'score_ee',
-        'score_o2': 'score_o2',
-        'score_three': 'score_three',
-        'score_geo': 'score_geo',
-        'district_boundaries': 'district_boundaries'
-      };
-      updateLegend(legendKeyMap[selectedLayer]);
-
-      // Toggle label layers (if added)
-      const labelLayers = ['score_vodafone_labels', 'score_ee_labels', 'score_o2_labels', 'score_three_labels'];
-      labelLayers.forEach(label => {
-        const visible = (selectedLayer + '_labels') === label;
-        if (map.getLayer(label)) {
-          map.setLayoutProperty(label, 'visibility', visible ? 'visible' : 'none');
-        }
-      });
-
-    })
-
-    // Function to update the legend dynamically
-    function updateLegend(layerId) {
-      const legend = document.getElementById('legend');
-      legend.innerHTML = ''; // Clear existing content
-
-      const legendData = legends[layerId];
-      if (!legendData) return;
-
-      // Add title
-      const title = document.createElement('div');
-      title.className = 'legend-title';
-      title.innerHTML = `${legendData.title}`;
-      legend.appendChild(title);
-
-      // Add each color/label item
-      legendData.layers.forEach((label, i) => {
-        const color = legendData.colors[i];
-        const item = document.createElement('div');
-
-        const key = document.createElement('span');
-        key.className = 'legend-key';
-        key.style.backgroundColor = color;
-
-        const value = document.createElement('span');
-        value.textContent = label;
-
-        item.appendChild(key);
-        item.appendChild(value);
-        legend.appendChild(item);
-      });
-    }
-
-      // Initialize legend on first load
-    const initialLayer = document.getElementById('map-select').value;
-    const legendKeyMap = {
-      'best_provider': 'best-provider',
-      'score_vodafone': 'score_vodafone',
-      'score_ee': 'score_ee',
-      'score_o2': 'score_o2',
-      'score_three': 'score_three',
-      'score_geo': 'score_geo',
-      'district_boundaries': 'district_boundaries'
-    };
-    updateLegend(legendKeyMap[initialLayer]);
-
-  });
-
-  // this script changes the cursor to default arrow ===================================================================================================
-  map.getCanvas().style.cursor = 'default';
-
-
-  // this script should load the search interactivity ==================================================================================================
-  // Add Mapbox GL Geocoder plugin
-  const geocoder = new MapboxGeocoder({
-    accessToken: mapboxgl.accessToken,
-    mapboxgl: mapboxgl,
-    flyTo: false, // need to manually deactive it if we want to customize the fly-to function
-    marker: false, // No need for marker if highlighting a polygon
-    placeholder: "Search UK postcode..",
-    countries: 'gb',       // Restrict to UK
-    types: 'postcode'      // Limit to postcode results only
-  });
-
-  // Add geocoder to a custom container in the overlay
-  document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
-
-  // this script should highlight the polygon ==========================================================================================================
-  // Listen for result and highlight matching polygon
-  geocoder.on('result', (e) => {
-    const postcode = e.result.text.toUpperCase();
-    const postcodeDistrict = postcode.match(/^[A-Z]{1,2}\d{1,2}/)[0];
-
-    // Highlight outline
-    map.setFilter('highlight_outline', [
-      '==',
-      ['get', 'DISTRICT_CODE'],
-      postcodeDistrict
-    ]);
-    map.setLayoutProperty('highlight_outline', 'visibility', 'visible');
-
-    // Fly to result
-    if (e.result.center) {
-      map.flyTo({ center: e.result.center, zoom: 13 });
-    }
-
-    // Wait for map to finish rendering
-    map.once('moveend', () => {
-      const layersToQuery = [
-        'best_provider',
-        'score_vodafone',
-        'score_ee',
-        'score_o2',
-        'score_three',
-        'score_geo',
-        'district_boundaries'
-      ];
-
-      let match = null;
-      for (const layer of layersToQuery) {
-        const visibility = map.getLayoutProperty(layer, 'visibility');
-        if (visibility !== 'visible') continue;
-
-        const features = map.queryRenderedFeatures({
-          layers: [layer],
-          filter: ['==', ['get', 'DISTRICT_CODE'], postcodeDistrict]
-        });
-
-        if (features.length > 0) {
-          match = features[0];
-          currentHighlightLayer = layer;
-          break;
-        }
-      }
-
-      if (match) {
-        // Always update highlight and selection, no matter the mode
-        const newDistrict = { code: postcodeDistrict, feature: match };
-
-        if (multiSelectMode) {
-          const isAlreadySelected = selectedDistricts.some(d => d.code === postcodeDistrict);
-          if (!isAlreadySelected && selectedDistricts.length < 5) {
-            selectedDistricts.push(newDistrict);
-          }
-        } else {
-          selectedDistricts = [newDistrict];
-        }
-
-        renderSelectedDistricts();
-        compareRows = selectedDistricts.map(d => featureToRow(d.feature));
-        updateCompareTable();
-        updateDistrictFillLayer();
-        updateHighlightOutlineLayer();
-        renderInfoBox(); // ✅ Ensure info panel updates too
-      } else {
-        ['score-three', 'score-ee', 'score-o2', 'score-vodafone'].forEach(id => {
-          const el = document.getElementById(id);
-          el.textContent = '—';
-          el.closest('.score-box').classList.remove('highlight');
-        });
-        currentHighlightLayer = null;
-        document.getElementById('panel-district-code').textContent = '';
-      }
-    });
-  });
-
-  geocoder.on('clear', () => {
-    // Always clear the outline
-    map.setLayoutProperty('highlight_outline', 'visibility', 'none');
-    map.setFilter('highlight_outline', ['==', ['get', 'DISTRICT_CODE'], '___HIDDEN___']);
-    currentHighlightedArea = null;
-    currentHighlightLayer = null;
-
-    if (!multiSelectMode) {
-      // In basic mode: clear everything (like clear-all-button)
-      selectedDistricts = [];
-      compareRows = [];
-      renderSelectedDistricts();
-      updateCompareTable();
-      updateDistrictFillLayer();
-      updateHighlightOutlineLayer();
-      renderInfoBox();
-    } else {
-      document.getElementById('district-note').style.visibility = 'hidden';
-    }
-  });
-
-  // this script enable outline highlight on mouseclick. works across layers and second click remove outline ======================================================
-
-  clickableLayers.forEach(layerId => {
-    map.on('click', layerId, (e) => {
-      const feature = e.features[0];
-      const areaCode = feature.properties.DISTRICT_CODE;
-
-      if (multiSelectMode) {
-        const isAlreadySelected = selectedDistricts.some(d => d.code === areaCode);
-        if (isAlreadySelected) {
-          // Remove from list
-          selectedDistricts = selectedDistricts.filter(d => d.code !== areaCode);
-          renderSelectedDistricts();
-          compareRows = selectedDistricts.map(d => featureToRow(d.feature));
-          updateCompareTable();
-
-          // Also remove highlight
-          updateHighlightOutlineLayer();
-          renderInfoBox();
-
-          if (selectedDistricts.length === 0) {
-            currentHighlightedArea = null;
-            currentHighlightLayer = null;
-          }
-          return; // Skip the rest
-        }
-      } else if (!multiSelectMode && currentHighlightedArea === areaCode) {
-        // Single-select deselection logic
-        currentHighlightedArea = null;
-        currentHighlightLayer = null;
-        selectedDistricts = [];
-        compareRows = [];
-        renderSelectedDistricts();
-        updateCompareTable();
-
-        map.setLayoutProperty('highlight_outline', 'visibility', 'none');
-        map.setFilter('highlight_outline', ['==', ['get', 'DISTRICT_CODE'], '___HIDDEN___']);
-        map.setFilter('district_fill', ['in', ['get', 'DISTRICT_CODE'], ['literal', []]]);
-        return;
-      }
-
-      currentHighlightedArea = areaCode;
-      currentHighlightLayer = layerId;
-
-      map.setFilter('highlight_outline', [
-        '==',
-        ['get', 'DISTRICT_CODE'],
-        areaCode
-      ]);
-      map.setLayoutProperty('highlight_outline', 'visibility', 'visible');
-
-      if (multiSelectMode) {
-        if (!selectedDistricts.some(d => d.code === areaCode)) {
-          if (selectedDistricts.length < 5) {
-            selectedDistricts.push({ code: areaCode, feature });
-            renderSelectedDistricts();
-            compareRows = selectedDistricts.map(d => featureToRow(d.feature));
-            updateCompareTable();
-            updateDistrictFillLayer();
-            updateHighlightOutlineLayer();
-            renderInfoBox();
-          } else {
-            // Prevent adding, but still restore highlight for existing
-            updateHighlightOutlineLayer(); // ensures outlines are reapplied
-          }
-        }
-      } else {
-        selectedDistricts = [{ code: areaCode, feature }];
-        renderSelectedDistricts();
-        compareRows = [featureToRow(feature)];
-        updateCompareTable();
-        updateDistrictFillLayer();
-        updateHighlightOutlineLayer();
-        renderInfoBox(); // make sure info box updates
-      }
-    });
-  });
-
-
-  // this script populates the Dynamic content box ======================================================
-  // Get reference to the information window element
-  const dataLayers = [
-  'best_provider',
-  'score_vodafone',
-  'score_ee',
-  'score_o2',
-  'score_three',
-  'score_geo',
-  'district_boundaries'
-  ];
-
-  // Render function for info content
-  function renderInfoBox(hoverFeature = null) {
-
-    // This ensures renderInfoBox() can be called unconditionally when clearing out districts — even if there's no selection or hover — and it won’t try to read undefined properties.
-    if (!hoverFeature && compareRows.length === 0) {
-      // Reset score boxes fully
-      ['ee', 'o2', 'three', 'vodafone'].forEach(key => {
-        const el = document.getElementById(`score-${key}`);
-        el.textContent = '—';
-        el.closest('.score-box').classList.remove('highlight');
-      });
-
-      document.getElementById('panel-district-code').textContent = '';
-      document.getElementById('district-note').style.visibility = 'hidden';
-      return;
-    }
-
-    const panelCodeEl = document.getElementById('panel-district-code');
-
-    // CASE 1: Hover only (no selection)
-    if (!compareRows.length && hoverFeature) {
-      const props = hoverFeature.properties;
-      panelCodeEl.textContent = props.DISTRICT_CODE || '';
-
-      const operatorScores = {
-        ee: { score: props.network_score_ee, tag: props.coverage_tag_ee },
-        o2: { score: props.network_score_o2, tag: props.coverage_tag_o2 },
-        three: { score: props.network_score_three, tag: props.coverage_tag_three },
-        vodafone: { score: props.network_score_vodafone, tag: props.coverage_tag_vodafone }
-      };
-
-      let maxScore = -1;
-      Object.values(operatorScores).forEach(({ score }) => {
-        if (typeof score === 'number' && !isNaN(score)) {
-          maxScore = Math.max(maxScore, score);
-        }
-      });
-
-      let limitedCoverageExists = false;
-
-      Object.entries(operatorScores).forEach(([key, { score, tag }]) => {
-        const scoreEl = document.getElementById(`score-${key}`);
-        const boxEl = scoreEl.closest('.score-box');
-
-        if (typeof score !== 'number' || isNaN(score)) {
-          scoreEl.textContent = '—';
-          boxEl.classList.remove('highlight');
-          return;
-        }
-
-        const percent = Math.floor(score);
-        const isLimited = tag === 1;
-
-        scoreEl.textContent = `${percent}%${isLimited ? '*' : ''}`;
-        boxEl.classList.toggle('highlight', score === maxScore);
-
-        if (isLimited) limitedCoverageExists = true;
-      });
-
-      // Compose note
-      let noteText = '';
-      if (props.is_district_score === 0 && props.DISTRICT_CODE) {
-        noteText += `These results are for the postcode area ${props.AREA_CODE}.`;
-      }
-      if (limitedCoverageExists) {
-        noteText += (noteText ? ' ' : '') + `* Our users have reported patchy signal on this operator in district ${props.DISTRICT_CODE}.`;
-      }
-
-      const noteEl = document.getElementById('district-note');
-      noteEl.textContent = noteText;
-      noteEl.style.visibility = noteText ? 'visible' : 'hidden';
-      return;
-    }
-
-    // CASE 2: No selection
-    if (!compareRows.length) {
-      ['ee', 'o2', 'three', 'vodafone'].forEach(key => {
-        const el = document.getElementById(`score-${key}`);
-        el.textContent = '—';
-        el.closest('.score-box').classList.remove('highlight');
-      });
-      panelCodeEl.textContent = '';
-      document.getElementById('district-note').style.visibility = 'hidden';
-      return;
-    }
-
-    // CASE 3: Selection
-    const isMulti = compareRows.length > 1;
-    panelCodeEl.textContent = isMulti ? '' : compareRows[0][0];
-
-    const operatorIndices = {
-      ee: 1,
-      o2: 2,
-      three: 3,
-      vodafone: 4
-    };
-
-    if (isMulti) {
-      // MULTI-DISTRICT MODE (average scores)
-      let maxScore = -1;
-      const operatorAverages = {};
-
-      Object.entries(operatorIndices).forEach(([key, colIndex]) => {
-        const scores = compareRows.map(row => row[colIndex])
-          .filter(score => typeof score === 'number' && !isNaN(score));
-
-        const avg = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
-        operatorAverages[key] = avg;
-        if (avg !== null) maxScore = Math.max(maxScore, avg);
-      });
-
-      // Compute floored scores before comparing
-      const operatorFloors = {};
-      let maxFloorScore = -1;
-
-      Object.entries(operatorAverages).forEach(([key, avg]) => {
-        if (avg === null || isNaN(avg)) {
-          operatorFloors[key] = null;
-          return;
-        }
-        const floored = Math.floor(avg);
-        operatorFloors[key] = floored;
-        if (floored > maxFloorScore) maxFloorScore = floored;
-      });
-
-      // Render and highlight based on floored values
-      Object.entries(operatorFloors).forEach(([key, floored]) => {
-        const el = document.getElementById(`score-${key}`);
-        const box = el.closest('.score-box');
-
-        if (floored === null) {
-          el.textContent = '—';
-          box.classList.remove('highlight');
-          return;
-        }
-
-        el.textContent = `${floored}%`;
-        box.classList.toggle('highlight', floored === maxFloorScore);
-      });
-
-      const anyIsAreaLevel = selectedDistricts.some(d => d.feature.properties?.is_district_score === 0);
-      const noteEl = document.getElementById('district-note');
-      noteEl.textContent = anyIsAreaLevel ? 'The average score includes some results at postcode area.' : '';
-      noteEl.style.visibility = anyIsAreaLevel ? 'visible' : 'hidden';
-    } else {
-      // SINGLE DISTRICT SELECTION
-      const props = selectedDistricts[0].feature.properties;
-
-      const operatorScores = {
-        ee: { score: props.network_score_ee, tag: props.coverage_tag_ee },
-        o2: { score: props.network_score_o2, tag: props.coverage_tag_o2 },
-        three: { score: props.network_score_three, tag: props.coverage_tag_three },
-        vodafone: { score: props.network_score_vodafone, tag: props.coverage_tag_vodafone }
-      };
-
-      let localMax = -1;
-      Object.values(operatorScores).forEach(({ score }) => {
-        if (typeof score === 'number' && !isNaN(score)) {
-          localMax = Math.max(localMax, score);
-        }
-      });
-
-      let limitedCoverageExists = false;
-
-      Object.entries(operatorScores).forEach(([key, { score, tag }]) => {
-        const el = document.getElementById(`score-${key}`);
-        const box = el.closest('.score-box');
-
-        if (typeof score !== 'number' || isNaN(score)) {
-          el.textContent = '—';
-          box.classList.remove('highlight');
-          return;
-        }
-
-        const isLimited = tag === 1;
-        el.textContent = `${Math.floor(score)}%${isLimited ? '*' : ''}`;
-        box.classList.toggle('highlight', score === localMax);
-        if (isLimited) limitedCoverageExists = true;
-      });
-
-      // Compose note
-      let noteText = '';
-      if (props.is_district_score === 0 && props.DISTRICT_CODE) {
-        noteText += `These results are for the postcode area ${props.AREA_CODE}.`;
-      }
-      if (limitedCoverageExists) {
-        noteText += (noteText ? ' ' : '') + `* Our users have reported patchy signal on this operator in district ${props.DISTRICT_CODE}.`;
-      }
-      const noteEl = document.getElementById('district-note');
-      noteEl.textContent = noteText;
-      noteEl.style.visibility = noteText ? 'visible' : 'hidden';
-      
-    }
-  }
-
-  // Central handler for mousemove ===================================================================================================================
-  map.on('mousemove', (e) => {
-    // If a polygon is currently highlighted, show its info only (and ignore hover)
-    if (currentHighlightedArea && currentHighlightLayer) {
-      const features = map.queryRenderedFeatures({
-        layers: [currentHighlightLayer],
-        filter: ['==', ['get', 'DISTRICT_CODE'], currentHighlightedArea]
-      });
-
-      if (features.length > 0 && features[0].properties) {
-        renderInfoBox(features[0].properties);
-      } else {
-        currentHighlightedArea = null;
-        currentHighlightLayer = null;
-      }
-      return; // Do not show hover info
-    }
-
-    // No highlight active: show hovered feature
-    const hoveredFeatures = map.queryRenderedFeatures(e.point, {
-      layers: dataLayers
-    });
-
-    if (hoveredFeatures.length > 0) {
-      renderInfoBox(hoveredFeatures[0]);
-    } else {
-      ['score-three', 'score-ee', 'score-o2', 'score-vodafone'].forEach(id => {
-        const el = document.getElementById(id);
-        el.textContent = '—';
-        el.closest('.score-box').classList.remove('highlight');
-        const starId = 'stars-' + id.split('-')[1];
-      });
-      document.getElementById('panel-district-code').textContent = '';
-      document.getElementById('district-note').style.visibility = 'hidden';
-    }
-  });
-
-  // Open FAQ overlay by pressing button
-    document.getElementById('faq-button').addEventListener('click', () => {
-    const faqOverlay = document.getElementById('overlay-faq');
-    const compareOverlay = document.getElementById('overlay-compare');
-
-    // Close compare if open
-    if (compareOverlay.classList.contains('open')) {
-      compareOverlay.classList.remove('open');
-    }
-
-    // Toggle FAQ
-    faqOverlay.classList.toggle('open');
-  });
-
-  // close FAQ overlay 
-  document.getElementById('faq-close').addEventListener('click', () => {
-  document.getElementById('overlay-faq').classList.remove('open');
-  });
-
-  // close FAQ overlay by pressing ESC
-  document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' || e.key === 'Esc') {
-    const faqOverlay = document.getElementById('overlay-faq');
-    faqOverlay.classList.remove('open');
-  }
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if ((e.key === 'Escape' || e.key === 'Esc') && compareOverlay.classList.contains('open')) {
-      compareOverlay.classList.remove('open');
-    }
-  });
-
-  // Add Click Handler for “Learn more” in the metric note
-  document.getElementById('learn-more-link').addEventListener('click', () => {
-    // Close compare overlay if it's open
-    document.getElementById('overlay-compare').classList.remove('open');
-    // Open the FAQ overlay
-    document.getElementById('overlay-faq').classList.add('open');
-  });
-
-  // Add Click Handler for “Learn more” in the map footnote
-  document.getElementById('map-learn-more-link').addEventListener('click', () => {
-    document.getElementById('overlay-compare').classList.remove('open');
-    document.getElementById('overlay-faq').classList.add('open');
-  });
-
-  // Add Compare Locations panel & functionality =============================================
-  // Compare my locations button logic
-  const compareOverlay = document.getElementById('overlay-compare');
-
-  const tableButton = document.getElementById('table-button');
-  const compareClose = document.getElementById('compare-close');
-
-  document.getElementById('table-button').addEventListener('click', () => {
-    const faqOverlay = document.getElementById('overlay-faq');
-    const compareOverlay = document.getElementById('overlay-compare');
-
-    // Close FAQ if open
-    if (faqOverlay.classList.contains('open')) {
-      faqOverlay.classList.remove('open');
-    }
-
-    // Toggle Compare
-    compareOverlay.classList.toggle('open');
-  });
-
-  compareClose.addEventListener('click', () => {
-    compareOverlay.classList.remove('open');
-  });
-
-  const compareTableBody = document.getElementById('compare-table-body');
-
-  function featureToRow(feature) {
-    const p = feature.properties;
-    return [
-      p.DISTRICT_CODE,
-      p.network_score_ee,
-      p.network_score_o2,
-      p.network_score_three,
-      p.network_score_vodafone,
-      ''
-    ];
-  }
-
-  // Tracks current table entries
-  let compareRows = [];
-
-  function updateCompareTable() {
-    const body = document.getElementById("compare-table-body");
-    const headerRow = document.querySelector("#compare-table thead tr");
-
-    // Operator keys and labels
-    const operatorKeys = ["ee", "o2", "three", "vodafone"];
-    const operatorLabels = ["EE", "O2", "Three", "Vodafone"];
-
-    // Reset table
-    headerRow.innerHTML = '';
-    body.innerHTML = '';
-
-    // Build header row
-    const headerBlank = document.createElement("th");
-    headerRow.appendChild(headerBlank);
-
-    const avgHeader = document.createElement("th");
-    avgHeader.textContent = "Average score";
-    headerRow.appendChild(avgHeader);
-
-    compareRows.forEach((row, index) => {
-      const code = row[0];
-      const isAreaLevel = selectedDistricts[index]?.feature?.properties?.is_district_score === 0;
-
-      const th = document.createElement("th");
-      th.className = "district-header";
-
-      th.innerHTML = `
-        <div class="district-header-wrapper">
-          ${code}${isAreaLevel ? '<sup>¹</sup>' : ''}
-          <button class="remove-district" title="Remove" onclick="removeDistrict('${code}')">&times;</button>
-        </div>
-      `;
-      headerRow.appendChild(th);
-    });
-
-    // Build a 2D matrix of operator scores: [operator][column]
-    // column 0 = average, 1..n = district columns
-    const scoreMatrix = operatorKeys.map((_, i) => {
-      const operatorScores = [];
-
-      // Calculate average
-      const scores = compareRows.map(row => row[i + 1]).filter(s => typeof s === 'number');
-      const avgScore = scores.length ? Math.floor(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
-      operatorScores.push(avgScore);
-
-      // Add individual district scores
-      compareRows.forEach(row => {
-        operatorScores.push(row[i + 1]);
-      });
-
-      return operatorScores;
-    });
-
-    // Transpose the matrix to get columns
-    const columnWiseScores = [];
-    for (let col = 0; col < scoreMatrix[0].length; col++) {
-      const colValues = scoreMatrix.map(row => row[col]);
-      const valid = colValues.filter(s => typeof s === 'number');
-      const max = valid.length ? Math.max(...valid) : null;
-      columnWiseScores.push({ values: colValues, max });
-    }
-
-    // Now render rows
-    operatorKeys.forEach((key, i) => {
-      const tr = document.createElement("tr");
-      const labelTd = document.createElement("td");
-      labelTd.innerHTML = `<strong>${operatorLabels[i]}</strong>`;
-      tr.appendChild(labelTd);
-
-    columnWiseScores.forEach((col, colIndex) => {
-      const td = document.createElement("td");
-      const value = col.values[i];
-
-      let isLimited = false;
-      if (colIndex > 0 && selectedDistricts[colIndex - 1]) {
-        const feature = selectedDistricts[colIndex - 1].feature;
-        const tagField = `coverage_tag_${key}`;
-        isLimited = feature?.properties?.[tagField] === 1;
-      }
-
-      if (typeof value === 'number') {
-        td.innerHTML = `${Math.floor(value)}%${isLimited ? '<sup>²</sup>' : ''}`;
-        if (value === col.max) td.classList.add("top-score-cell");
-      } else {
-        td.textContent = "—";
-      }
-
-      tr.appendChild(td);
-    });
-
-      body.appendChild(tr);
-    });
-
-    updateDistrictFillLayer();
-    updateHighlightOutlineLayer();
-  }
-
-  function removeDistrict(code) {
-    selectedDistricts = selectedDistricts.filter(d => d.code !== code);
-    compareRows = selectedDistricts.map(d => featureToRow(d.feature));
-    renderSelectedDistricts();
-    updateCompareTable();
-    updateDistrictFillLayer();
-    updateHighlightOutlineLayer();
-    renderInfoBox();
-
-    if (selectedDistricts.length === 0) {
-      currentHighlightedArea = null;
-      currentHighlightLayer = null;
-    }
-  }
-
-  // Clear all functionality
-  document.getElementById('clear-all-button').addEventListener('click', () => {
-    selectedDistricts = [];
-    renderSelectedDistricts();
-    compareRows = [];
-    updateCompareTable();
-    updateDistrictFillLayer();
-    updateHighlightOutlineLayer();
-    renderInfoBox();
-    currentHighlightLayer = null;
-    currentHighlightedArea = null;
-  });
-
-  function updateDistrictFillLayer() {
-    console.log('Updating fill layer')
-    const isActive = document.getElementById('map-select').value === 'district_boundaries';
-    const districtCodes = multiSelectMode
-      ? selectedDistricts.map(d => d.code)
-      : compareRows.length ? [compareRows[0][0]] : [];
-
-    if (map.getLayer('district_fill')) {
-      map.setLayoutProperty('district_fill', 'visibility', isActive ? 'visible' : 'none');
-      if (isActive) {
-        console.log("mode:", multiSelectMode);
-        console.log("selectedDistricts:", selectedDistricts);
-        console.log("compareRows:", compareRows);
-        console.log("districtCodes:", districtCodes);
-        map.setFilter('district_fill', ['in', ['get', 'DISTRICT_CODE'], ['literal', districtCodes]]);
-      }
-    }
-  }
-
-  function updateHighlightOutlineLayer() {
-    const layerId = 'highlight_outline';
-
-    const districtCodes = multiSelectMode
-    ? selectedDistricts.map(d => d.code)
-    : compareRows.length ? [compareRows[0][0]] : [];
-
-    if (map.getLayer(layerId)) {
-      if (districtCodes.length) {
-        map.setFilter(layerId, ['in', ['get', 'DISTRICT_CODE'], ['literal', districtCodes]]);
-        map.setLayoutProperty(layerId, 'visibility', 'visible');
-      } else {
-        map.setFilter(layerId, ['==', ['get', 'DISTRICT_CODE'], '___HIDDEN___']);
-        map.setLayoutProperty(layerId, 'visibility', 'none');
-      }
-    }
-  }
-
-  function renderSelectedDistricts() {
-    selectedDistrictBox.innerHTML = '';
-
-    selectedDistricts.forEach(({ code }) => {
-      const badge = document.createElement('div');
-      badge.style.cssText = `
-        display: inline-block;
-        background: #eee;
-        border-radius: 4px;
-        padding: 4px 8px;
-        margin: 2px;
-        font-size: 14px;
-        position: relative;
-      `;
-      badge.innerHTML = `
-        ${code}
-        <span style="
-          position: absolute;
-          top: -6px;
-          right: -4px;
-          font-size: 14px;
-          cursor: pointer;
-          color: #999;
-          font-weight: bold;
-        " title="Remove">&times;</span>
-      `;
-      badge.querySelector('span').addEventListener('click', () => {
-        selectedDistricts = selectedDistricts.filter(d => d.code !== code);
-        renderSelectedDistricts();
-        compareRows = selectedDistricts.map(d => featureToRow(d.feature));
-        updateCompareTable();
-        updateDistrictFillLayer();
-        updateHighlightOutlineLayer();
-        renderInfoBox(); // force reset of score boxes
-
-        if (selectedDistricts.length === 0) {
-          currentHighlightedArea = null;
-          currentHighlightLayer = null;
-        }
-      });
-      selectedDistrictBox.appendChild(badge);
-    });
-
-    // ✅ Add the clear-all button after badges
-    if (selectedDistricts.length > 1) {
-      const clearBtn = document.createElement('div');
-      clearBtn.id = 'clear-selected-button';
-      clearBtn.textContent = '🗑️';
-      clearBtn.style.cssText = `
-        font-size: 14px;
-        color: #666;
-        cursor: pointer;
-        background: #eee;
-        border-radius: 4px;
-        padding: 4px 8px;
-        margin: 2px;
-      `;
-      clearBtn.addEventListener('click', () => {
-        selectedDistricts = [];
-        renderSelectedDistricts();
-        compareRows = [];
-        updateCompareTable();
-        updateDistrictFillLayer();
-        updateHighlightOutlineLayer();
-        renderInfoBox(); // Reset boxes
-        currentHighlightedArea = null;
-        currentHighlightLayer = null;
-      });
-      selectedDistrictBox.appendChild(clearBtn);
-    }
-  }
-
-  const toggleButton = document.getElementById('overlay-toggle-button');
-  const interactivityPanel = document.getElementById('overlay-interactivity');
-  const legendPanel = document.getElementById('overlay-legend');
-
-    toggleButton.addEventListener('click', () => {
-      const isCollapsed = interactivityPanel.classList.toggle('collapsed-left');
-      legendPanel.classList.toggle('collapsed-left');
-      toggleButton.classList.toggle('collapsed', isCollapsed);
-      toggleButton.textContent = isCollapsed ? '▶' : '◀';
-  });
-
-  // FAQ toggle logic
-  document.querySelectorAll('.faq-question').forEach(questionEl => {
-    questionEl.addEventListener('click', () => {
-      const currentItem = questionEl.closest('.faq-item');
-      const isOpen = currentItem.classList.contains('open');
-
-      // Collapse all items
-      document.querySelectorAll('.faq-item').forEach(item => {
-        item.classList.remove('open');
-        item.querySelector('.faq-answer').style.display = 'none';
-        item.querySelector('.faq-toggle').textContent = '+';
-      });
-
-      // Expand clicked one if it was closed
-      if (!isOpen) {
-        currentItem.classList.add('open');
-        currentItem.querySelector('.faq-answer').style.display = 'block';
-        currentItem.querySelector('.faq-toggle').textContent = '–';
-      }
-    });
-  });
-    
-</script>
+<!-- WHAT IT MEASURES -->
+<section id="what">
+  <div class="section-label">The problem</div>
+  <h2>Speed isn't the same as quality</h2>
+  <p>
+    For years, mobile operators competed almost exclusively on peak download speeds — headline figures that were easy to advertise but told consumers almost nothing about their day-to-day experience. A network that could occasionally hit gigabit speeds under ideal conditions, but delivered a poor connection the majority of the time, scored the same as one that consistently worked well for everyone.
+  </p>
+  <p>
+    These top speeds are vanity metrics. They measure the best a network can theoretically do, not what it actually delivers to ordinary people in the places they live and work. The question they cannot answer is the only one that matters to most users:
+  </p>
+
+  <div class="pull-quote">
+    <p>"How often does my network just work — well enough to do the things I actually need to do?"</p>
+  </div>
+
+  <p>
+    Consistent Quality was created to answer that question, with a fully open and transparent methodology that any operator, regulator, researcher or consumer body can inspect, use and build upon — free of charge.
+  </p>
+
+  <div class="two-col">
+    <div class="col-before">
+      <h3>Before Consistent Quality</h3>
+      <p>Industry ranked networks by peak download speed. Marketing, investment and engineering were all optimised toward achieving occasional top speeds. Consumers had no reliable way to compare networks on what mattered. Regulators had no open standard to hold operators accountable.</p>
+    </div>
+    <div class="col-after">
+      <h3>With Consistent Quality</h3>
+      <p>Networks are measured — and now compete — on how reliably they deliver a good experience for ordinary users. Operators in dozens of countries bonus staff on Consistent Quality scores. Ofcom uses it to inform consumers. The industry has fundamentally changed what it optimises for.</p>
+    </div>
+  </div>
+</section>
+
+<!-- METHODOLOGY -->
+<section id="methodology">
+  <div class="section-label">The methodology</div>
+  <h2>What makes a connection<br><em>"good enough"?</em></h2>
+  <p>
+    Consistent Quality defines "good enough" as a connection that is reliably capable of fulfilling most users' expectations when using any of the five application types that people use most on their mobile devices — at typical settings, not laboratory maximums.
+  </p>
+
+  <div class="app-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin:2rem 0;">
+    <div class="app-card" style="background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:1.25rem;text-align:center;">
+      <div style="font-size:1.8rem;margin-bottom:0.5rem;">📺</div>
+      <div style="font-weight:500;font-size:0.9rem;color:var(--ink);margin-bottom:0.25rem;">Streaming Video</div>
+      <div style="font-size:0.78rem;color:var(--ink-muted);">YouTube, Netflix, Disney+</div>
+    </div>
+    <div class="app-card" style="background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:1.25rem;text-align:center;">
+      <div style="font-size:1.8rem;margin-bottom:0.5rem;">📹</div>
+      <div style="font-weight:500;font-size:0.9rem;color:var(--ink);margin-bottom:0.25rem;">Video &amp; Voice Calls</div>
+      <div style="font-size:0.78rem;color:var(--ink-muted);">WhatsApp, Zoom, FaceTime</div>
+    </div>
+    <div class="app-card" style="background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:1.25rem;text-align:center;">
+      <div style="font-size:1.8rem;margin-bottom:0.5rem;">🌐</div>
+      <div style="font-weight:500;font-size:0.9rem;color:var(--ink);margin-bottom:0.25rem;">Web Browsing</div>
+      <div style="font-size:0.78rem;color:var(--ink-muted);">Chrome, Safari</div>
+    </div>
+    <div class="app-card" style="background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:1.25rem;text-align:center;">
+      <div style="font-size:1.8rem;margin-bottom:0.5rem;">📱</div>
+      <div style="font-weight:500;font-size:0.9rem;color:var(--ink);margin-bottom:0.25rem;">Social Media</div>
+      <div style="font-size:0.78rem;color:var(--ink-muted);">Instagram, TikTok, Facebook</div>
+    </div>
+    <div class="app-card" style="background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:1.25rem;text-align:center;">
+      <div style="font-size:1.8rem;margin-bottom:0.5rem;">🎮</div>
+      <div style="font-weight:500;font-size:0.9rem;color:var(--ink);margin-bottom:0.25rem;">Mobile Gaming</div>
+      <div style="font-size:0.78rem;color:var(--ink-muted);">Fortnite, PUBG, CoD Mobile</div>
+    </div>
+  </div>
+
+  <p>A good network should enable a user to use any of these application types and get a good experience — whenever and wherever they are. Consistent Quality measures how often that is actually true.</p>
+
+  <div class="section-label" style="margin-top:3rem;">How it's calculated</div>
+  <h3 style="font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:1rem;letter-spacing:-0.01em;">A pass/fail test, run millions of times</h3>
+  <p>The calculation is straightforward and fully transparent. For each test taken on a network:</p>
+
+  <div style="background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:1.5rem 2rem;margin:1.5rem 0;">
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:0.75rem 1.25rem;align-items:start;">
+      <div style="background:var(--signal);color:white;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:500;flex-shrink:0;margin-top:2px;">1</div>
+      <p style="margin:0;font-size:0.92rem;">A series of measurements are taken simultaneously — download speed, upload speed, latency, jitter, packet loss, and time to first byte.</p>
+      <div style="background:var(--signal);color:white;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:500;flex-shrink:0;margin-top:2px;">2</div>
+      <p style="margin:0;font-size:0.92rem;">If <strong>all six</strong> measurements pass their respective thresholds, the test is a <span style="color:var(--success);font-weight:500;">pass</span>. If any single measurement falls below its threshold, the whole test is a <span style="color:#c0392b;font-weight:500;">fail</span>. A fast download speed cannot compensate for bad latency.</p>
+      <div style="background:var(--signal);color:white;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:500;flex-shrink:0;margin-top:2px;">3</div>
+      <p style="margin:0;font-size:0.92rem;">The Consistent Quality score is the percentage of tests that passed. <strong>Example:</strong> 60 passes out of 100 tests = 60% Consistent Quality. Higher is better.</p>
+    </div>
+  </div>
+
+  <p style="font-size:0.88rem;color:var(--ink-muted);">This all-or-nothing approach reflects real user experience: a video call that fails because of high packet loss is a bad experience, regardless of how fast the download speed is.</p>
+
+  <div class="section-label" style="margin-top:3rem;">The six KPIs</div>
+  <h3 style="font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:0.5rem;letter-spacing:-0.01em;">Different apps need different things</h3>
+  <p>Not all KPIs matter equally to all applications. The table below shows which KPIs most affect each application type — and why the thresholds are set where they are, grounded in published standards from Netflix, Google, ITU, Cisco, GSMA and others.</p>
+
+  <div style="overflow-x:auto;margin-top:1.5rem;">
+  <table class="threshold-table" style="min-width:600px;">
+    <thead>
+      <tr>
+        <th>KPI</th>
+        <th>What it measures</th>
+        <th>Most affects</th>
+        <th><span class="badge badge-core">Core</span></th>
+        <th><span class="badge badge-excellent">Excellent</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="metric">Download speed</td>
+        <td style="font-size:0.82rem;color:var(--ink-muted);">Data received from network</td>
+        <td style="font-size:0.82rem;">📺 🌐 📱</td>
+        <td>≥ 1.5 Mbps</td>
+        <td>≥ 5 Mbps</td>
+      </tr>
+      <tr>
+        <td class="metric">Upload speed</td>
+        <td style="font-size:0.82rem;color:var(--ink-muted);">Data sent to network</td>
+        <td style="font-size:0.82rem;">📹 📱</td>
+        <td>≥ 500 Kbps</td>
+        <td>≥ 1.5 Mbps</td>
+      </tr>
+      <tr>
+        <td class="metric">Latency</td>
+        <td style="font-size:0.82rem;color:var(--ink-muted);">Round-trip response time</td>
+        <td style="font-size:0.82rem;">📹 🌐 📱 🎮</td>
+        <td>≤ 100 ms</td>
+        <td>≤ 50 ms</td>
+      </tr>
+      <tr>
+        <td class="metric">Jitter</td>
+        <td style="font-size:0.82rem;color:var(--ink-muted);">Variation in latency</td>
+        <td style="font-size:0.82rem;">📹 🎮</td>
+        <td>≤ 20 ms</td>
+        <td>≤ 12 ms</td>
+      </tr>
+      <tr>
+        <td class="metric">Packet loss</td>
+        <td style="font-size:0.82rem;color:var(--ink-muted);">Data packets lost in transit</td>
+        <td style="font-size:0.82rem;">📹 🎮</td>
+        <td>≤ 4%</td>
+        <td>≤ 1%</td>
+      </tr>
+      <tr>
+        <td class="metric">Time to first byte</td>
+        <td style="font-size:0.82rem;color:var(--ink-muted);">Time before data starts arriving</td>
+        <td style="font-size:0.82rem;">📺 🌐 📱</td>
+        <td>≤ 1.2 s</td>
+        <td>≤ 0.8 s</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div style="margin-top:1.25rem;padding:1rem 1.25rem;background:var(--signal-pale);border-radius:6px;border-left:3px solid var(--signal);">
+    <p style="font-size:0.85rem;margin:0;color:var(--ink-soft);">
+      <strong>Why these thresholds?</strong> Each threshold is grounded in published research and recommendations from major standards bodies and application providers: Netflix (5 Mbps for HD streaming), ITU G.114 (latency for VoIP), Google web.dev (800ms TTFB), Cisco and Microsoft Teams (jitter and packet loss for video calls), 3GPP TS 23.501 (gaming latency), and GSMA network experience research. Thresholds are reviewed periodically as application requirements evolve.
+    </p>
+  </div>
+</section>
+
+<!-- ADOPTION -->
+<section id="adoption">
+  <div class="section-label">Global adoption</div>
+  <h2>From one report to a global standard</h2>
+  <p>
+    Since its introduction in 2018, Consistent Quality has been adopted by mobile operators, regulators and consumer organisations across more than 40 countries. Operators now use it not only to report network quality publicly, but to set internal targets, drive engineering investment and incentivise staff.
+  </p>
+
+  <div class="ofcom-block">
+    <h3>Adopted by Ofcom — the UK communications regulator</h3>
+    <p>In 2025, Ofcom adopted Consistent Quality as the foundation of <a href="https://www.ofcom.org.uk/phones-and-broadband/coverage-and-speeds/map-your-mobile" target="_blank">Map Your Mobile</a> — a public tool that allows UK consumers to check real-world mobile network performance at their home or work postcode, at 50-metre resolution. In June 2026, Ofcom will announce that a derivative of Consistent Quality will be used to measure and report on all UK mobile operators, making it a formal UK regulatory standard.</p>
+  </div>
+
+  <div class="adoption-grid" style="margin-top: 2rem;">
+    <div class="adoption-card">
+      <div class="adoption-region">United States</div>
+      <div class="adoption-operators">Verizon — first operator to adopt Consistent Quality in marketing materials (2018). T-Mobile, AT&amp;T, Sprint also measured.</div>
+    </div>
+    <div class="adoption-card">
+      <div class="adoption-region">Canada</div>
+      <div class="adoption-operators">Bell Canada, Telus, Rogers. Telus CEO cited Consistent Quality leadership in corporate press releases.</div>
+    </div>
+    <div class="adoption-card">
+      <div class="adoption-region">Brazil</div>
+      <div class="adoption-operators">TIM Brazil — first operator to bonus staff on Consistent Quality scores (2020). Claro, Vivo also measured.</div>
+    </div>
+    <div class="adoption-card">
+      <div class="adoption-region">Italy</div>
+      <div class="adoption-operators">TIM Italy now bonuses its entire technical staff based on Consistent Quality achievement.</div>
+    </div>
+    <div class="adoption-card">
+      <div class="adoption-region">Japan</div>
+      <div class="adoption-operators">NTT DoCoMo, KDDI/au, SoftBank, Rakuten Mobile. In 2024, the incoming DoCoMo CEO set winning Consistent Quality as his primary public target.</div>
+    </div>
+    <div class="adoption-card">
+      <div class="adoption-region">Indonesia</div>
+      <div class="adoption-operators">Telkomsel, Indosat and others. Indonesia reports published regularly by Opensignal.</div>
+    </div>
+    <div class="adoption-card">
+      <div class="adoption-region">Latin America</div>
+      <div class="adoption-operators">Entel (Chile &amp; Peru), Claro (multiple markets), Tigo (multiple markets), Movistar.</div>
+    </div>
+    <div class="adoption-card">
+      <div class="adoption-region">United Kingdom</div>
+      <div class="adoption-operators">EE, O2, Three, Vodafone, VMO2. Used by Which? and GoCompare to help consumers compare networks. Formally adopted by Ofcom 2025.</div>
+    </div>
+    <div class="adoption-card">
+      <div class="adoption-region">Nordics &amp; Europe</div>
+      <div class="adoption-operators">Telia, Telenor, TDC, 3, ICE (Norway), A1 (Austria), Proximus (Belgium), T-Mobile (Germany &amp; Poland) and many others.</div>
+    </div>
+  </div>
+</section>
+
+<!-- OPEN STANDARD -->
+<section id="open">
+  <div class="section-label">Open source</div>
+  <h2>Fully open.<br>No black box.</h2>
+  <p>
+    When Consistent Quality was created in 2018, every other major network measurement company had taken the opposite approach. RootMetrics (RootScore), Umlaut (Umlaut Score) and others protected their methodologies as proprietary commercial assets — available only to paying customers, with the inner workings deliberately withheld from public scrutiny.
+  </p>
+  <p>
+    Consistent Quality was designed from the outset to be different. The complete methodology — every threshold, every KPI, every calculation — is published openly and is free for anyone to inspect, use, adapt or build upon. No licence fees. No access restrictions. No gatekeeping.
+  </p>
+
+  <div class="open-source-box">
+    <h3>Why openness matters</h3>
+    <p style="max-width: none;">A methodology that anyone can scrutinise is one that everyone can trust. Operators can adopt it knowing it is independent and unbiased. Regulators can use it knowing its basis is transparent and defensible. Consumers can rely on it knowing it has not been shaped by commercial interests. And researchers can build on it, challenge it, and improve it over time.</p>
+    <p style="max-width: none; margin-top: 1rem;">This is not how network measurement worked in 2018. Consistent Quality was a deliberate break from industry convention — a choice to put public benefit ahead of commercial advantage.</p>
+  </div>
+</section>
+
+<!-- ORIGIN -->
+<section id="origin">
+  <div class="section-label">Origin</div>
+  <h2>How Consistent Quality came to be</h2>
+  <p>
+    Consistent Quality was invented by <strong>Tom Luke</strong> in 2018, while serving as Vice President at Tutela Technologies — a Canadian mobile network measurement company later acquired by Opensignal.
+  </p>
+  <p>
+    Tom identified that the mobile industry's reliance on peak speed metrics was failing consumers. He conceived Consistent Quality as a consumer-first alternative, advocated for it to be made fully open-source rather than proprietary, and spent the following seven years working to convince operators, regulators and consumer organisations around the world to adopt it.
+  </p>
+  <p>
+    Tom received no patent income, no royalties and no financial reward for the invention. His goal throughout has been public benefit: better connectivity for ordinary people, driven by an industry that competes on the right things.
+  </p>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-year">September 2018</div>
+      <h3>Consistent Quality invented and named</h3>
+      <p>Tom Luke conceives the metric at Tutela Technologies, defines the KPIs and thresholds, and proposes the name "Consistent Quality". The methodology is made fully open-source.</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">October 2018</div>
+      <h3>First public launch</h3>
+      <p>Consistent Quality debuts publicly in Tutela's US Mobile LTE Network Quality 2018 report. Verizon adopts it immediately in customer-facing marketing materials.</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">2019 – 2020</div>
+      <h3>Global operator adoption begins</h3>
+      <p>Operators across North America, Latin America, Europe and Southeast Asia begin using Consistent Quality in public reporting. TIM Brazil and Verizon begin bonusing staff on the metric.</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">2020</div>
+      <h3>Opensignal acquires Tutela</h3>
+      <p>Comlinkdata combines Tutela and Opensignal. Consistent Quality becomes a central metric across Opensignal's global reporting platform, expanding its reach significantly.</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">2022 – 2024</div>
+      <h3>Japan and Italy adopt at scale</h3>
+      <p>All four major Japanese operators are measured. KDDI and SoftBank headline corporate press releases with Consistent Quality wins. TIM Italy begins bonusing its entire technical staff. The incoming President of NTT DoCoMo publicly sets winning Consistent Quality as his company's primary target.</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">2025</div>
+      <h3>Ofcom adopts Consistent Quality for UK consumers</h3>
+      <p>Ofcom adopts Consistent Quality as the foundation of Map Your Mobile — a public tool giving UK consumers postcode-level mobile network quality data. Tom Luke is quoted at the launch. Which? and GoCompare also adopt the metric for consumer comparison tools.</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">June 2026</div>
+      <h3>UK regulatory standard confirmed</h3>
+      <p>Ofcom announces that a derivative of Consistent Quality will be used to measure and report on all UK mobile operators — enshrining it as a formal UK regulatory standard for consumer-facing network quality.</p>
+    </div>
+  </div>
+
+  <p style="margin-top: 2rem; font-size: 0.88rem; color: var(--ink-muted);">
+    Tom Luke is currently Vice President, Innovation at Opensignal. Enquiries: <a href="mailto:tom.luke@opensignal.com" style="color: var(--signal);">tom.luke@opensignal.com</a>
+  </p>
+</section>
+
+<footer>
+  <div>
+    <div class="footer-brand">Consistent Quality</div>
+    <div class="footer-credit">
+      An open-source standard invented by <a href="#">Tom Luke</a> in 2018.<br>
+      Free to use, inspect and build upon by anyone.<br>
+      Adopted by Ofcom, Opensignal, Which? and operators globally.
+    </div>
+  </div>
+  <div class="footer-links">
+    <a href="#what">What it measures</a>
+    <a href="#methodology">Methodology</a>
+    <a href="#adoption">Adoption</a>
+    <a href="#open">Open standard</a>
+    <a href="#origin">Origin &amp; history</a>
+    <a href="https://www.ofcom.org.uk/phones-and-broadband/coverage-and-speeds/map-your-mobile" target="_blank">Ofcom Map Your Mobile ↗</a>
+  </div>
+</footer>
+
+</body>
+</html>
